@@ -1,7 +1,13 @@
 import React, {Component, PropTypes} from 'react';
 import {Link} from 'react-router';
+//
+// type Props = {
+//   players: Array<string>
+// }
 
 class Menu extends Component {
+
+  //props: Props;
 
   renderPlayers() {
 

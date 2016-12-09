@@ -3,7 +3,7 @@ import {Match, Redirect} from 'react-router';
 import Router from 'react-router/BrowserRouter';
 import IO from 'socket.io-client';
 
-import {Menu, Test, Room} from '../pages/';
+import {Menu, Test, TakePicture, Room, Game} from '../pages/';
 
 let router = undefined;
 
@@ -11,7 +11,8 @@ class App extends Component {
 
   state = {
     players: [],
-    playersInMyRoom: []
+    playersInMyRoom: [],
+    roomId: 0
   };
 
   componentDidMount() {
@@ -39,9 +40,10 @@ class App extends Component {
     console.log(`Init die peer`);
   }
 
-  roomFound(room) {
-    this.socket.emit(`joinRoom`, room);
-    router.transitionTo(`/rooms/${room}`);
+  roomFound(roomId) {
+    this.socket.emit(`joinRoom`, roomId);
+    this.setState({roomId});
+    router.transitionTo(`/rooms/${roomId}/picture`);
   }
 
   roomNotFound(room) {
@@ -85,12 +87,13 @@ class App extends Component {
     this.setState({players});
   }
 
-  addRoom(router) {
+  addRoom() {
     this.socket.emit(`createRoom`);
     this.socket.on(`roomCreated`, roomId => {
       const {playersInMyRoom} = this.state;
       playersInMyRoom.push(this.socket.id);
-      router.transitionTo(`/rooms/${roomId}`);
+      this.setState({roomId});
+      router.transitionTo(`/rooms/${roomId}/picture`);
     });
   }
 
@@ -102,9 +105,15 @@ class App extends Component {
     router = setRouter;
   }
 
+  takeYourPicture(e) {
+    e.preventDefault();
+    const {roomId} = this.state;
+    router.transitionTo(`/rooms/${roomId}/wait`);
+  }
+
   render() {
 
-    const {players, playersInMyRoom} = this.state;
+    const {players, playersInMyRoom, roomId} = this.state;
 
     return (
       <Router>
@@ -125,7 +134,7 @@ class App extends Component {
                 <Menu
                   setRouter={this.setRouter(router)}
                   players={players}
-                  addRoom={() => this.addRoom(router)}
+                  addRoom={() => this.addRoom()}
                   checkRoom={room => this.checkRoom(room)}
                 />
               )}
@@ -133,11 +142,30 @@ class App extends Component {
 
             {/* HOE ID DOORSTUREN VIA THIS.PROPS.PARAMS?? */}
             <Match
-              exactly pattern='/rooms/:id'
+              exactly pattern='/rooms/:id/picture'
+              render={() => (
+                <TakePicture
+                  takeYourPicture={e => this.takeYourPicture(e)}
+                  roomId={roomId}
+                />
+              )}
+            />
+
+            {/* HOE ID DOORSTUREN VIA THIS.PROPS.PARAMS?? */}
+            <Match
+              exactly pattern='/rooms/:id/wait'
               render={() => (
                 <Room
                   playersInMyRoom={playersInMyRoom}
                 />
+              )}
+            />
+
+            {/* HOE ID DOORSTUREN VIA THIS.PROPS.PARAMS?? */}
+            <Match
+              exactly pattern='/rooms/:id/game'
+              render={() => (
+                <Game />
               )}
             />
 

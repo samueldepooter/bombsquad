@@ -1,7 +1,6 @@
 module.exports.register = (server, options, next) => {
 
   const io = require(`socket.io`)(server.listener);
-  const crypto = require(`crypto`);
 
   let players = [];
 
@@ -12,7 +11,8 @@ module.exports.register = (server, options, next) => {
     const {id: playerId} = socket;
 
     const player = {
-      id: playerId
+      id: playerId,
+      picture: ``
     };
 
     players.push(player);
@@ -27,8 +27,7 @@ module.exports.register = (server, options, next) => {
     console.log(players);
 
     socket.on(`createRoom`, () => {
-      //code veranderen naar 4 random cijfers JONAAAASSSSSS
-      const code = crypto.randomBytes(4).toString(`hex`);
+      const code = Math.floor(Math.random() * 9000) + 1000; //generate random nummer tussen 1000 en 9999
 
       socket.join(code);
 
