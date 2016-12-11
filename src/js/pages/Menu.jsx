@@ -1,3 +1,5 @@
+// @flow
+
 import React, {Component, PropTypes} from 'react';
 import {Link} from 'react-router';
 //
@@ -25,27 +27,26 @@ class Menu extends Component {
     e.preventDefault();
     console.log(`Submit`);
 
-    const {code} = this.refs;
-
     const {checkRoom} = this.props;
-    checkRoom(code.value);
+    checkRoom(this.code.value);
+
   }
 
   render() {
 
-    const {addRoom} = this.props;
+    const {onAddRoom} = this.props;
 
     return (
       <div>
         <header>
-          <h1 className='title'>Pass da bomb</h1>
+          <h1 className='title'>Bomb Squad</h1>
         </header>
 
-        <Link to={`/rooms/create`} className='btn' onClick={() => addRoom()}>Add room</Link>
+        <Link to={`/rooms/create`} className='btn' onClick={() => onAddRoom()}>Add room</Link>
 
         <form onSubmit={e => this.submitCode(e)}>
           <label htmlFor='code'>Typ je code in</label>
-          <input ref={`code`} type='text' placeholder='code van de room' />
+          <input ref={code => this.code = code} type='text' placeholder='code van de room' />
         </form>
 
         <section>
@@ -61,8 +62,12 @@ class Menu extends Component {
 
 Menu.propTypes = {
   players: PropTypes.array,
-  addRoom: PropTypes.func,
+  onAddRoom: PropTypes.func,
   checkRoom: PropTypes.func
 };
+
+// Menu.contextTypes = {
+//   router: PropTypes.object
+// };
 
 export default Menu;

@@ -1,37 +1,46 @@
-//@flow
+// @flow
 
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
+
+type player = {
+  id: string,
+  picture: string
+};
 
 class Room extends Component {
 
   state = {};
 
+  props: {
+    playersInMyRoom: Array<player>,
+    roomId: number
+  }
+
   renderPlayers() {
     const {playersInMyRoom} = this.props;
+    console.log(playersInMyRoom);
 
     return playersInMyRoom.map((player, i) => {
+      console.log(player);
       return (
-        <li className='player' key={i}>{player}</li>
+        <li className='player' key={i}>{player.id}</li>
       );
     });
   }
 
   render() {
 
-    console.log(this.props);
-
-    const {playersInMyRoom} = this.props;
+    const {playersInMyRoom, roomId} = this.props;
 
     return (
       <div>
         <header>
-          {/* <h1>Room: {this.props.params.id}</h1> */}
-          <h1 className='title'>Room</h1>
+          <h1 className='title'>Code: {roomId}</h1>
         </header>
 
         <section>
           <h2 className='subtitle'>Host</h2>
-          <p>{playersInMyRoom[0]}</p>
+          <p>{playersInMyRoom[0].id}</p>
         </section>
 
         <section>
@@ -46,10 +55,5 @@ class Room extends Component {
   }
 
 }
-
-Room.propTypes = {
-  params: PropTypes.object,
-  playersInMyRoom: PropTypes.array
-};
 
 export default Room;

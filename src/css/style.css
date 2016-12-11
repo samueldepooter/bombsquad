@@ -55,7 +55,8 @@ section {
 .video {
   position: relative;
   height: 100vh;
-  margin-left: -60vw;
+  margin-left: -75vw;
+  transform: scale(-1, 1);
 }
 
 .takePictureBtn {
@@ -63,4 +64,8 @@ section {
   position: absolute;
   bottom: 0;
   left: 0;
+  background: white;
+  color: black;
+  padding: 1rem;
+  border: none;
 }

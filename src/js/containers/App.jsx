@@ -1,3 +1,5 @@
+// @flow
+
 import React, {Component} from 'react';
 import {Match, Redirect} from 'react-router';
 import Router from 'react-router/BrowserRouter';
@@ -7,13 +9,22 @@ import {Menu, Test, TakePicture, Room, Game} from '../pages/';
 
 let router = undefined;
 
+type state = {
+  players: Array<Object>,
+  playersInMyRoom: Array<Object>,
+  roomId: string,
+  myPictureData: string
+}
+
 class App extends Component {
 
-  state = {
+
+  state: state = {
     players: [],
     playersInMyRoom: [],
-    roomId: 0
-  };
+    roomId: ``,
+    myPictureData: ``
+  }
 
   componentDidMount() {
     this.initSocket();
@@ -34,6 +45,10 @@ class App extends Component {
 
     this.socket.on(`roomFound`, room => this.roomFound(room));
     this.socket.on(`roomNotFound`, room => this.roomNotFound(room));
+  }
+
+  setRouter(setRouter) {
+    router = setRouter;
   }
 
   initPeer() {
@@ -87,33 +102,34 @@ class App extends Component {
     this.setState({players});
   }
 
-  addRoom() {
+  addRoomHandler() {
+
     this.socket.emit(`createRoom`);
-    this.socket.on(`roomCreated`, roomId => {
+
+    this.socket.on(`roomCreated`, ({player, roomId}) => {
       const {playersInMyRoom} = this.state;
-      playersInMyRoom.push(this.socket.id);
+      playersInMyRoom.push(player);
+
       this.setState({roomId});
       router.transitionTo(`/rooms/${roomId}/picture`);
     });
+
   }
 
   checkRoom(room) {
     this.socket.emit(`checkRoom`, room);
   }
 
-  setRouter(setRouter) {
-    router = setRouter;
-  }
-
-  takeYourPicture(e) {
-    e.preventDefault();
+  takePictureHandler(myPictureData) {
     const {roomId} = this.state;
+
+    this.setState({myPictureData});
     router.transitionTo(`/rooms/${roomId}/wait`);
   }
 
   render() {
 
-    const {players, playersInMyRoom, roomId} = this.state;
+    const {players, playersInMyRoom, roomId, myPictureData} = this.state;
 
     return (
       <Router>
@@ -134,34 +150,32 @@ class App extends Component {
                 <Menu
                   setRouter={this.setRouter(router)}
                   players={players}
-                  addRoom={() => this.addRoom()}
+                  onAddRoom={() => this.addRoomHandler()}
                   checkRoom={room => this.checkRoom(room)}
                 />
               )}
             />
 
-            {/* HOE ID DOORSTUREN VIA THIS.PROPS.PARAMS?? */}
             <Match
               exactly pattern='/rooms/:id/picture'
               render={() => (
                 <TakePicture
-                  takeYourPicture={e => this.takeYourPicture(e)}
-                  roomId={roomId}
+                  onTakePicture={data => this.takePictureHandler(data)}
                 />
               )}
             />
 
-            {/* HOE ID DOORSTUREN VIA THIS.PROPS.PARAMS?? */}
             <Match
               exactly pattern='/rooms/:id/wait'
               render={() => (
                 <Room
+                  roomId={roomId}
                   playersInMyRoom={playersInMyRoom}
+                  myPictureData={myPictureData}
                 />
               )}
             />
 
-            {/* HOE ID DOORSTUREN VIA THIS.PROPS.PARAMS?? */}
             <Match
               exactly pattern='/rooms/:id/game'
               render={() => (

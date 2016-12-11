@@ -31,26 +31,36 @@ module.exports.register = (server, options, next) => {
 
       socket.join(code);
 
-      socket.emit(`roomCreated`, code);
+      const data = {
+        player: player,
+        roomId: code
+      };
+
+      socket.emit(`roomCreated`, data);
     });
 
     socket.on(`joinRoom`, room => {
       socket.join(room);
 
-      const players = [];
-
       //de room die je joined opvragen van socket
       const myRoom = io.sockets.adapter.rooms[room];
 
-      //elke player die in de room zit pushen naar players array
+      const playersInMyRoom = [];
+
+      //elke player (is enkel het id) die in de room zit pushen naar playersInMyRoom array
       Object.keys(myRoom.sockets).forEach(player => {
-        players.push(player);
+        console.log(player, `in my room`);
+        //dit id zoeken in alle players en dat object pushen naar playersInMyRoom
+        players.map(p => {
+          console.log(player, p.id);
+          if (p.id === player) playersInMyRoom.push(p);
+        });
       });
 
       const data = {
-        player: playerId,
+        player: player,
         room: room,
-        players: players
+        players: playersInMyRoom
       };
 
       //naar iedereen in de room sturen dat je gejoined bent
@@ -67,10 +77,8 @@ module.exports.register = (server, options, next) => {
       console.log(rooms);
 
       if (rooms.hasOwnProperty(id)) {
-        //room gevonden
         socket.emit(`roomFound`, id);
       } else {
-        //room niet gevonden
         socket.emit(`roomNotFound`, id);
       }
     });
