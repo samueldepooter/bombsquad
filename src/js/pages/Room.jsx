@@ -49,6 +49,8 @@ class Room extends Component {
   renderHostName() {
     const {myId, playersInMyRoom} = this.props;
 
+    if (!playersInMyRoom[0]) return;
+
     let host = playersInMyRoom[0].id;
     if (myId === playersInMyRoom[0].id) host = `Jij bent de host`;
 
