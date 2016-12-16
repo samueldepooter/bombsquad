@@ -10,7 +10,7 @@ type Player = {
 
 type Props = {
   players: Array<Player>,
-  checkRoom: () => void,
+  onCheckRoom: () => void,
   onAddRoom: () => void
 }
 
@@ -34,8 +34,8 @@ class Menu extends Component {
     e.preventDefault();
     console.log(`Submit`);
 
-    const {checkRoom} = this.props;
-    checkRoom(this.code.value);
+    const {onCheckRoom} = this.props;
+    onCheckRoom(this.code.value);
   }
 
   render() {

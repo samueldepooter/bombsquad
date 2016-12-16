@@ -36,10 +36,10 @@ class TakePicture extends Component {
                               navigator.mozGetUserMedia ||
                               navigator.msGetUserMedia;
 
-    if (navigator.mediaDevices.getUserMedia) {
+    if (navigator.mediaDevices) {
       navigator.mediaDevices.getUserMedia({video: true})
         .then(stream => { // mediaDevices verplicht -> https://developer.mozilla.org/en/docs/Web/API/Navigator/getUserMedia
-          this.video.srcObject = stream;
+          this.video.srcObject = stream; //srcObject verplicht, werkt niet met src
           this.video.play();
         })
         .catch(e => {
@@ -49,7 +49,7 @@ class TakePicture extends Component {
 
     this.video.addEventListener(`canplay`, () => {
       if (!streaming) {
-        w = this.video.videoWidth;
+        w = this.video.videoWidth; //videoWidth & videoHeight verplicht, werkt niet met width & height
         h = this.video.videoHeight;
 
         this.video.setAttribute(`width`, `${w}`);

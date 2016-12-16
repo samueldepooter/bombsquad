@@ -19,10 +19,10 @@ module.exports.register = (server, options, next) => {
     players.push(player);
 
     //naar iedereen buiten jezelf sturen dat je gejoined bent
-    socket.broadcast.emit(`addPlayer`, player);
+    socket.broadcast.emit(`add`, player);
 
     //naar jezelf alle players die geconnect zijn met de server sturen
-    socket.emit(`addAllPlayers`, players);
+    socket.emit(`addAll`, players);
 
     console.log(`Player with ID: ${player.id} is connected. ${players.length} spelers in totaal`);
     console.log(players);
@@ -53,7 +53,7 @@ module.exports.register = (server, options, next) => {
 
       me.picture = picture;
 
-      io.in(me.room).emit(`playerCreatedPicture`, me);
+      io.in(me.room).emit(`pictureTaken`, me);
     });
 
     socket.on(`joinRoom`, room => {
@@ -87,7 +87,7 @@ module.exports.register = (server, options, next) => {
       };
 
       //naar iedereen in de room sturen dat je gejoined bent
-      io.in(room).emit(`playerJoinedRoom`, data);
+      io.in(room).emit(`joined`, data);
     });
 
     socket.on(`checkRoom`, id => {
@@ -95,9 +95,9 @@ module.exports.register = (server, options, next) => {
       console.log(rooms);
 
       if (rooms.hasOwnProperty(id)) {
-        socket.emit(`roomFound`, id);
+        socket.emit(`found`, id);
       } else {
-        socket.emit(`roomNotFound`, id);
+        socket.emit(`notFound`, id);
       }
     });
 
@@ -107,7 +107,7 @@ module.exports.register = (server, options, next) => {
         return p.id !== playerId;
       });
 
-      socket.broadcast.emit(`removePlayer`, playerId);
+      socket.broadcast.emit(`remove`, playerId);
 
       console.log(`Player[${player.id}] left`);
       console.log(players);

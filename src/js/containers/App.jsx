@@ -12,8 +12,7 @@ let router: Object = {};
 type state = {
   players: Array<Object>,
   playersInMyRoom: Array<Object>,
-  roomId: string,
-  myPictureData: string
+  roomId: string
 }
 
 type Player = {
@@ -27,8 +26,7 @@ class App extends Component {
   state: state = {
     players: [],
     playersInMyRoom: [],
-    roomId: ``,
-    myPictureData: ``
+    roomId: ``
   }
 
   socket: Object;
@@ -43,17 +41,17 @@ class App extends Component {
     this.socket.on(`connect`, this.initPeer);
 
     //1 player toevoegen als je reeds gejoined bent en iemand anders joined ook
-    this.socket.on(`addPlayer`, player => this.addPlayer(player));
-    this.socket.on(`removePlayer`, playerId => this.removePlayerWSHandler(playerId));
+    this.socket.on(`add`, player => this.addWSHandler(player));
+    this.socket.on(`remove`, playerId => this.removeWSHandler(playerId));
     //alle players toevoegen als je net joined
-    this.socket.on(`addAllPlayers`, players => this.addAllPlayers(players));
+    this.socket.on(`addAll`, players => this.addAllWSHandler(players));
 
-    this.socket.on(`playerJoinedRoom`, data => this.playerJoinedRoomWSHandler(data));
+    this.socket.on(`joined`, data => this.joinedWSHandler(data));
 
-    this.socket.on(`roomFound`, room => this.roomFound(room));
-    this.socket.on(`roomNotFound`, room => this.roomNotFound(room));
+    this.socket.on(`found`, room => this.foundWSHandler(room));
+    this.socket.on(`notFound`, room => this.notFoundWSHandler(room));
 
-    this.socket.on(`playerCreatedPicture`, player => this.addPictureToPlayerHandler(player));
+    this.socket.on(`pictureTaken`, player => this.pictureTakenWSHandler(player));
   }
 
   setRouter(setRouter: Object) {
@@ -64,7 +62,7 @@ class App extends Component {
     console.log(`Init die peer`);
   }
 
-  addPictureToPlayerHandler(player: Player) {
+  pictureTakenWSHandler(player: Player) {
     const {playersInMyRoom} = this.state;
 
     const thePlayer = playersInMyRoom.find(p => {
@@ -76,29 +74,29 @@ class App extends Component {
     this.setState({playersInMyRoom});
   }
 
-  roomFound(roomId: string) {
+  foundWSHandler(roomId: string) {
     this.socket.emit(`joinRoom`, roomId);
     this.setState({roomId});
     router.transitionTo(`/rooms/${roomId}/picture`);
   }
 
-  roomNotFound(room: string) {
+  notFoundWSHandler(room: string) {
     console.log(`Room ${room} werd niet gevonden!`);
   }
 
-  playerJoinedRoomWSHandler(data: {player: string, room: string, players: Array<Object>}) {
+  joinedWSHandler(data: {player: string, room: string, players: Array<Object>}) {
     const {player, room, players} = data;
     console.log(`${player} joined room ${room}`);
     this.setState({playersInMyRoom: players});
   }
 
-  addPlayer(player: Player) {
+  addWSHandler(player: Player) {
     const {players} = this.state;
     players.push(player);
     this.setState({players});
   }
 
-  removePlayerWSHandler(playerId: number) {
+  removeWSHandler(playerId: number) {
     const {players, playersInMyRoom} = this.state;
 
     const updatedPlayers = players.filter(p => {
@@ -115,7 +113,7 @@ class App extends Component {
     });
   }
 
-  addAllPlayers(allPlayers: Array<Object>) {
+  addAllWSHandler(allPlayers: Array<Object>) {
     const {players} = this.state;
     allPlayers.forEach(player => {
       players.push(player);
@@ -137,14 +135,12 @@ class App extends Component {
 
   }
 
-  checkRoom(room: string) {
+  checkRoomHandler(room: string) {
     this.socket.emit(`checkRoom`, room);
   }
 
   takePictureHandler(myPictureData: string) {
     const {roomId} = this.state;
-
-    this.setState({myPictureData});
 
     this.socket.emit(`newPicture`, myPictureData);
     router.transitionTo(`/rooms/${roomId}/wait`);
@@ -152,11 +148,12 @@ class App extends Component {
 
   startGameHandler() {
     console.log(`socket emitten naar alle players in de room als hier op geklikt wordt om ze in de game state te pushen`);
+    this.socket.emit(`startGame`);
   }
 
   render() {
 
-    const {players, playersInMyRoom, roomId, myPictureData} = this.state;
+    const {players, playersInMyRoom, roomId} = this.state;
 
     return (
       <Router>
@@ -178,7 +175,7 @@ class App extends Component {
                   setRouter={this.setRouter(router)}
                   players={players}
                   onAddRoom={() => this.addRoomHandler()}
-                  checkRoom={room => this.checkRoom(room)}
+                  onCheckRoom={room => this.checkRoomHandler(room)}
                 />
               )}
             />
@@ -208,7 +205,6 @@ class App extends Component {
                     roomId={roomId}
                     myId={this.socket.id}
                     playersInMyRoom={playersInMyRoom}
-                    myPictureData={myPictureData}
                     onStartGame={() => this.startGameHandler()}
                   />);
 
