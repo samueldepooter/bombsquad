@@ -61,6 +61,21 @@ class TakePicture extends Component {
     }, false);
   }
 
+  onTakePictureChange(e: Object) {
+
+    const files = e.target.files;
+    let file;
+    if (files && files.length > 0) {
+      file = files[0];
+      const fileReader = new FileReader();
+      fileReader.onload = e => {
+        const {onTakePicture} = this.props;
+        onTakePicture(e.target.result);
+      };
+      fileReader.readAsDataURL(file);
+    }
+  }
+
   snapshotHandler() {
     this.canvas.width = w;
     this.canvas.height = h;
@@ -79,6 +94,7 @@ class TakePicture extends Component {
       <section>
 
         <div className='camera'>
+          <input type='file' className='takePicture' accept='image/*' onChange={e => this.onTakePictureChange(e)} />
           <video className='video' autoPlay>Taking picture is not available!</video>
         </div>
 
