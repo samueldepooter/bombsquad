@@ -1,8 +1,8 @@
-// @flow
+//@flow
 
 import React, {Component} from 'react';
 
-type player = {
+type Player = {
   id: string,
   picture: string
 };
@@ -12,25 +12,54 @@ class Room extends Component {
   state = {};
 
   props: {
-    playersInMyRoom: Array<player>,
-    roomId: number
+    playersInMyRoom: Array<Player>,
+    roomId: string,
+    myId: string,
+    onStartGame: () => void
   }
 
   renderPlayers() {
-    const {playersInMyRoom} = this.props;
-    console.log(playersInMyRoom);
+    const {playersInMyRoom, myId} = this.props;
 
     return playersInMyRoom.map((player, i) => {
-      console.log(player);
+      let name = player.id;
+      if (player.id === myId) name = `Ik`;
       return (
-        <li className='player' key={i}>{player.id}</li>
+        <li className='player' key={i}>
+          <p>{name}</p>
+          <div className='playerPictureWrap'>
+            <img className='playerPicture' src={player.picture} />
+          </div>
+        </li>
       );
     });
   }
 
+  renderStartButton() {
+    const {myId, playersInMyRoom, onStartGame} = this.props;
+
+    //als ik niet de eerste in de room ben, dan ben ik niet de host
+    if (myId !== playersInMyRoom[0].id) return;
+
+    return (
+      <button onClick={() => onStartGame()}>Start de game!</button>
+    );
+  }
+
+  renderHostName() {
+    const {myId, playersInMyRoom} = this.props;
+
+    let host = playersInMyRoom[0].id;
+    if (myId === playersInMyRoom[0].id) host = `Jij bent de host`;
+
+    return (
+      <p>{host}</p>
+    );
+  }
+
   render() {
 
-    const {playersInMyRoom, roomId} = this.props;
+    const {roomId} = this.props;
 
     return (
       <div>
@@ -40,7 +69,7 @@ class Room extends Component {
 
         <section>
           <h2 className='subtitle'>Host</h2>
-          <p>{playersInMyRoom[0].id}</p>
+          {this.renderHostName()}
         </section>
 
         <section>
@@ -50,10 +79,13 @@ class Room extends Component {
           </ul>
         </section>
 
+        {this.renderStartButton()}
+
       </div>
     );
   }
 
 }
+
 
 export default Room;

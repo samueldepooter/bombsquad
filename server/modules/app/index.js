@@ -12,7 +12,8 @@ module.exports.register = (server, options, next) => {
 
     const player = {
       id: playerId,
-      picture: ``
+      picture: ``,
+      room: ``
     };
 
     players.push(player);
@@ -36,7 +37,23 @@ module.exports.register = (server, options, next) => {
         roomId: code
       };
 
+      const me = players.find(p => {
+        if (p.id === playerId) return p;
+      });
+
+      me.room = code;
+
       socket.emit(`roomCreated`, data);
+    });
+
+    socket.on(`newPicture`, picture => {
+      const me = players.find(p => {
+        if (p.id === playerId) return p;
+      });
+
+      me.picture = picture;
+
+      io.in(me.room).emit(`playerCreatedPicture`, me);
     });
 
     socket.on(`joinRoom`, room => {
@@ -57,6 +74,12 @@ module.exports.register = (server, options, next) => {
         });
       });
 
+      const me = players.find(p => {
+        if (p.id === playerId) return p;
+      });
+
+      me.room = room;
+
       const data = {
         player: player,
         room: room,
@@ -66,11 +89,6 @@ module.exports.register = (server, options, next) => {
       //naar iedereen in de room sturen dat je gejoined bent
       io.in(room).emit(`playerJoinedRoom`, data);
     });
-
-    socket.on(`leaveRoom`, room => {
-      socket.leave(room);
-    });
-
 
     socket.on(`checkRoom`, id => {
 

@@ -1,20 +1,27 @@
-// @flow
+//@flow
 
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
 import {Link} from 'react-router';
-//
-// type Props = {
-//   players: Array<string>
-// }
+
+type Player = {
+  id: string,
+  picture: string
+}
+
+type Props = {
+  players: Array<Player>,
+  checkRoom: () => void,
+  onAddRoom: () => void
+}
 
 class Menu extends Component {
 
-  //props: Props;
+  props: Props;
+  code: Object;
 
   renderPlayers() {
 
     const {players} = this.props;
-    console.log(players);
 
     return players.map((player, i) => {
       return (
@@ -23,13 +30,12 @@ class Menu extends Component {
     });
   }
 
-  submitCode(e) {
+  submitCode(e: Object) {
     e.preventDefault();
     console.log(`Submit`);
 
     const {checkRoom} = this.props;
     checkRoom(this.code.value);
-
   }
 
   render() {
@@ -59,12 +65,6 @@ class Menu extends Component {
     );
   }
 }
-
-Menu.propTypes = {
-  players: PropTypes.array,
-  onAddRoom: PropTypes.func,
-  checkRoom: PropTypes.func
-};
 
 // Menu.contextTypes = {
 //   router: PropTypes.object
