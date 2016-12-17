@@ -63,16 +63,65 @@ class TakePicture extends Component {
 
   onTakePictureChange(e: Object) {
 
+    /* OUDE CODE: laat ik even staan want dit werkt zeker op alle smartphones maar is niet geoptimised */
+    // const files = e.target.files;
+    // let file;
+    // if (files && files.length > 0) {
+    //   file = files[0];
+    //   const fileReader = new FileReader();
+    //   fileReader.onload = e => {
+    //     const {onTakePicture} = this.props;
+    //     onTakePicture(e.target.result);
+    //   };
+    //   fileReader.readAsDataURL(file);
+    // }
+
     const files = e.target.files;
     let file;
     if (files && files.length > 0) {
       file = files[0];
+
       const fileReader = new FileReader();
       fileReader.onload = e => {
-        const {onTakePicture} = this.props;
-        onTakePicture(e.target.result);
+
+        const img = new Image();
+        img.src = e.target.result;
+
+        img.onload = () => {
+
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 600;
+
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          this.canvas.width = width;
+          this.canvas.height = height;
+
+          if (this.ctx) this.ctx.drawImage(img, 0, 0, width, height);
+
+          const dataurl = this.canvas.toDataURL(`image/png`);
+
+          const {onTakePicture} = this.props;
+          onTakePicture(dataurl);
+
+        };
       };
+
       fileReader.readAsDataURL(file);
+
     }
   }
 
@@ -94,6 +143,7 @@ class TakePicture extends Component {
       <section>
 
         <div className='camera'>
+          <img src='' className='myImg' />
           <input type='file' className='takePicture' capture accept='image/*' onChange={e => this.onTakePictureChange(e)} />
           <video className='video' autoPlay>Taking picture is not available!</video>
         </div>

@@ -12,7 +12,8 @@ let router: Object = {};
 type state = {
   players: Array<Object>,
   playersInMyRoom: Array<Object>,
-  roomId: string
+  roomId: string,
+  loading: boolean
 }
 
 type Player = {
@@ -26,7 +27,8 @@ class App extends Component {
   state: state = {
     players: [],
     playersInMyRoom: [],
-    roomId: ``
+    roomId: ``,
+    loading: true
   }
 
   socket: Object;
@@ -46,7 +48,8 @@ class App extends Component {
     //alle players toevoegen als je net joined
     this.socket.on(`addAll`, players => this.addAllWSHandler(players));
 
-    this.socket.on(`joined`, data => this.joinedWSHandler(data));
+    this.socket.on(`joined`, player => this.joinedWSHandler(player));
+    this.socket.on(`getRoomData`, data => this.roomDataWSHandler(data));
 
     this.socket.on(`found`, room => this.foundWSHandler(room));
     this.socket.on(`notFound`, room => this.notFoundWSHandler(room));
@@ -60,6 +63,19 @@ class App extends Component {
 
   initPeer() {
     console.log(`Init die peer`);
+  }
+
+  roomDataWSHandler(data: {room: string, players: Array<Player>}) {
+
+    console.log(`data from the whole room because i just joined`);
+    console.log(data);
+
+    let {roomId, playersInMyRoom} = this.state;
+
+    roomId = data.room;
+    playersInMyRoom = data.players;
+
+    this.setState({roomId, playersInMyRoom});
   }
 
   pictureTakenWSHandler(player: Player) {
@@ -84,10 +100,13 @@ class App extends Component {
     console.log(`Room ${room} werd niet gevonden!`);
   }
 
-  joinedWSHandler(data: {player: string, room: string, players: Array<Object>}) {
-    const {player, room, players} = data;
-    console.log(`${player} joined room ${room}`);
-    this.setState({playersInMyRoom: players});
+  joinedWSHandler(player: {id: string, picture: string, room: string}) {
+    const {roomId, playersInMyRoom} = this.state;
+
+    console.log(`${player.id} joined room ${roomId}`);
+
+    playersInMyRoom.push(player);
+    this.setState({playersInMyRoom});
   }
 
   addWSHandler(player: Player) {
@@ -118,7 +137,7 @@ class App extends Component {
     allPlayers.forEach(player => {
       players.push(player);
     });
-    this.setState({players});
+    this.setState({players, loading: false});
   }
 
   addRoomHandler() {
@@ -153,7 +172,9 @@ class App extends Component {
 
   render() {
 
-    const {players, playersInMyRoom, roomId} = this.state;
+    const {players, playersInMyRoom, roomId, loading} = this.state;
+
+    console.log(loading);
 
     return (
       <Router>
@@ -176,6 +197,7 @@ class App extends Component {
                   players={players}
                   onAddRoom={() => this.addRoomHandler()}
                   onCheckRoom={room => this.checkRoomHandler(room)}
+                  loading={loading}
                 />
               )}
             />
@@ -225,14 +247,6 @@ class App extends Component {
             />
 
             <Match exactly pattern='/*' render={() => {
-              return (
-                <Redirect to={{
-                  pathname: `/menu`
-                }} />
-              );
-            }} />
-
-            <Match exactly pattern='/rooms/create' render={() => {
               return (
                 <Redirect to={{
                   pathname: `/menu`

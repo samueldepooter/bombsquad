@@ -26,7 +26,6 @@ module.exports.register = (server, options, next) => {
     socket.emit(`addAll`, players);
 
     console.log(`Player with ID: ${player.id} is connected. ${players.length} spelers in totaal`);
-    console.log(players);
 
     socket.on(`createRoom`, () => {
       let number = Math.floor(Math.random() * 9000) + 1000; //generate random nummer tussen 1000 en 9999
@@ -44,8 +43,6 @@ module.exports.register = (server, options, next) => {
 
       //gegenereed nummer bij de codes steken
       codes.push(number);
-
-      console.log(codes);
       //room joinen
       socket.join(number);
 
@@ -98,20 +95,19 @@ module.exports.register = (server, options, next) => {
 
       me.room = room;
 
-      const data = {
-        player: player,
+      const roomData = {
         room: room,
         players: playersInMyRoom
       };
 
-      //naar iedereen in de room sturen dat je gejoined bent
-      io.in(room).emit(`joined`, data);
+      //alle data uit de room naar jezelf sturen
+      socket.emit(`getRoomData`, roomData);
+
+      //naar iedereen buiten jezelf in de room jouw player object sturen
+      socket.broadcast.in(room).emit(`joined`, player);
     });
 
     socket.on(`checkRoom`, id => {
-
-      console.log(rooms);
-
       if (rooms.hasOwnProperty(id)) {
         socket.emit(`found`, id);
       } else {
@@ -120,16 +116,12 @@ module.exports.register = (server, options, next) => {
     });
 
     socket.on(`disconnect`, () => {
-
       players = players.filter(p => {
         return p.id !== playerId;
       });
 
       socket.broadcast.emit(`remove`, playerId);
-
       console.log(`Player[${player.id}] left`);
-      console.log(players);
-
     });
 
   });

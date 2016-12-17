@@ -1,7 +1,6 @@
 //@flow
 
 import React, {Component} from 'react';
-import {Link} from 'react-router';
 
 type Player = {
   id: string,
@@ -11,7 +10,8 @@ type Player = {
 type Props = {
   players: Array<Player>,
   onCheckRoom: () => void,
-  onAddRoom: () => void
+  onAddRoom: () => void,
+  loading: boolean
 }
 
 class Menu extends Component {
@@ -40,15 +40,24 @@ class Menu extends Component {
 
   render() {
 
-    const {onAddRoom} = this.props;
+    const {onAddRoom, loading} = this.props;
+
+    const loader = document.querySelector(`.loader`);
+    if (loader) {
+      if (loading) loader.style.display = `flex`;
+      else loader.style.display = `none`;
+    }
 
     return (
       <div>
+
+        <div className='loader'>One moment... fetching all those bombers</div>
+
         <header>
           <h1 className='title'>Bomb Squad</h1>
         </header>
 
-        <Link to={`/rooms/create`} className='btn' onClick={() => onAddRoom()}>Add room</Link>
+        <button className='btn' onClick={() => onAddRoom()}>Add room</button>
 
         <form onSubmit={e => this.submitCode(e)}>
           <label htmlFor='code'>Typ je code in</label>
@@ -65,9 +74,5 @@ class Menu extends Component {
     );
   }
 }
-
-// Menu.contextTypes = {
-//   router: PropTypes.object
-// };
 
 export default Menu;
