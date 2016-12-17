@@ -1,3 +1,5 @@
+const Timer = require(`./Timer`);
+
 module.exports.register = (server, options, next) => {
 
   const io = require(`socket.io`)(server.listener);
@@ -17,6 +19,12 @@ module.exports.register = (server, options, next) => {
       room: ``
     };
 
+    const room = {
+      id: ``,
+      started: false,
+      timer: 0
+    };
+
     players.push(player);
 
     //naar iedereen buiten jezelf sturen dat je gejoined bent
@@ -29,6 +37,7 @@ module.exports.register = (server, options, next) => {
 
     socket.on(`createRoom`, () => {
       let number = Math.floor(Math.random() * 9000) + 1000; //generate random nummer tussen 1000 en 9999
+      room.id = number.toString();
 
       //tussen alle rooms kijken of de gegenereerde room al bestaat
       //als die bestaat -> nieuwe code genereren tot er eentje gemaakt wordt dat nog niet bestaat
@@ -38,11 +47,6 @@ module.exports.register = (server, options, next) => {
           number = Math.floor(Math.random() * 9000) + 1000;
         }
       });
-
-      const room = {
-        id: number.toString(),
-        started: false
-      };
 
       //gegenereede room bij de rooms steken
       rooms.push(room);
@@ -55,13 +59,8 @@ module.exports.register = (server, options, next) => {
         room: room.id
       };
 
-      //jezelf in de players zoeken
-      const me = players.find(p => {
-        if (p.id === playerId) return p;
-      });
-
       //jouw room op het gegenereerd nummer zetten
-      me.room = number;
+      player.room = number;
 
       socket.emit(`roomCreated`, data);
     });
@@ -69,11 +68,7 @@ module.exports.register = (server, options, next) => {
     socket.on(`startGame`, id => {
 
       //room op starten zetten zodat je niet meer kan joinen
-      const myRoom = rooms.find(room => {
-        return room.id = id;
-      });
-
-      myRoom.started = true;
+      room.started = true;
 
       //eigen room ophalen voor de players te vinden
       const mySocketRoom = socketRooms[id];
@@ -86,17 +81,18 @@ module.exports.register = (server, options, next) => {
 
       //in playersInMyRoom zoeken naar een random player -> deze krijgt de bom
       const bombHolder = playersInMyRoom[Math.floor(Math.random() * playersInMyRoom.length)].id;
+
+      //tijd aanmaken voor de room en degene die met de bom start meegeven
+      const timer = new Timer(io, bombHolder, room, 5);
+      //tijd starten
+      timer.start();
+
       io.in(id).emit(`startGame`, bombHolder);
     });
 
     socket.on(`newPicture`, picture => {
-      const me = players.find(p => {
-        if (p.id === playerId) return p;
-      });
-
-      me.picture = picture;
-
-      io.in(me.room).emit(`pictureTaken`, me);
+      player.picture = picture;
+      io.in(player.room).emit(`pictureTaken`, player);
     });
 
     socket.on(`joinRoom`, id => {
@@ -118,11 +114,7 @@ module.exports.register = (server, options, next) => {
         });
       });
 
-      const me = players.find(p => {
-        if (p.id === playerId) return p;
-      });
-
-      me.room = id;
+      player.room = id;
 
       const roomData = {
         room: id,
@@ -143,13 +135,8 @@ module.exports.register = (server, options, next) => {
 
       if (theRoom) {
 
-        //room zoeken in de rooms array
-        const myRoom = rooms.find(room => {
-          return room.id === id;
-        });
-
         //checken of de room al niet bezig is en indien het zo is returnen
-        if (myRoom.started) {
+        if (theRoom.started) {
           socket.emit(`busy`, id);
           return;
         }

@@ -11,7 +11,8 @@ type Props = {
   players: Array<Player>,
   onCheckRoom: () => void,
   onAddRoom: () => void,
-  loading: boolean
+  loading: boolean,
+  error: string
 }
 
 class Menu extends Component {
@@ -38,7 +39,8 @@ class Menu extends Component {
 
   render() {
 
-    const {onAddRoom, loading} = this.props;
+    const {onAddRoom, loading, error} = this.props;
+    console.log(error);
 
     const loader = document.querySelector(`.loader`);
     if (loader) {
@@ -68,6 +70,8 @@ class Menu extends Component {
             {this.renderPlayers()}
           </ul>
         </section>
+
+        <p className='error'>{error}</p>
       </div>
     );
   }

@@ -10,7 +10,8 @@ import {
   TakePicture,
   Room,
   BombHolder,
-  Spectator
+  Spectator,
+  Dead
 } from '../pages/';
 
 let router: Object = {};
@@ -26,7 +27,10 @@ type state = {
   playersInMyRoom: Array<Player>,
   room: string,
   bombHolder: string,
-  loading: boolean
+  loading: boolean,
+  time: number,
+  dead: boolean,
+  error: string
 }
 
 class App extends Component {
@@ -36,7 +40,10 @@ class App extends Component {
     playersInMyRoom: [],
     room: ``,
     bombHolder: ``,
-    loading: true
+    loading: true,
+    time: 0,
+    dead: false,
+    error: ``
   }
 
   socket: Object;
@@ -65,6 +72,7 @@ class App extends Component {
 
     this.socket.on(`pictureTaken`, player => this.pictureTakenWSHandler(player));
     this.socket.on(`startGame`, bombHolder => this.startGameWSHandler(bombHolder));
+    this.socket.on(`time`, data => this.timeWSHandler(data));
   }
 
   setRouter(setRouter: Object) {
@@ -75,8 +83,33 @@ class App extends Component {
     console.log(`Init die peer`);
   }
 
+  timeWSHandler(data: {time: number, bombHolder: string}) {
+    //checken of jij de bom hebt
+    if (data.bombHolder === this.socket.id) {
+      //jij hebt de bom
+      console.log(data.time, `You are holding the bomb`);
+      //als je tijd op is ben je zelf dood
+      if (data.time <= 0) {
+        //TODO: alle variabelen resetten als je dood bent
+        let {dead} = this.state;
+        dead = true;
+        this.setState({dead});
+        router.transitionTo(`/dead`);
+        console.log(`YOU are dead`);
+      }
+    } else {
+      //jij hebt niet de bom
+      console.log(data.time, `Currently holding the bomb: ${data.bombHolder}`);
+      //als de tijd op is, is deze speler dood
+      if (data.time <= 0) console.log(`Player ${data.bombHolder} is dead`);
+    }
+  }
+
   busyWSHandler(id: string) {
-    console.log(`Room ${id} is al bezig met spelen`);
+    let {error} = this.state;
+    error = `Room ${id} is al bezig met spelen`;
+
+    this.setState({error});
   }
 
   startGameWSHandler(bombHolder: string) {
@@ -120,7 +153,9 @@ class App extends Component {
   }
 
   notFoundWSHandler(id: string) {
-    console.log(`Room ${id} werd niet gevonden!`);
+    let {error} = this.state;
+    error = `Room ${id} werd niet gevonden!`;
+    this.setState({error});
   }
 
   joinedWSHandler(player: {id: string, picture: string, room: string}) {
@@ -194,9 +229,7 @@ class App extends Component {
 
   render() {
 
-    const {players, playersInMyRoom, room, loading} = this.state;
-
-    console.log(room);
+    const {players, playersInMyRoom, room, loading, error} = this.state;
 
     return (
       <Router>
@@ -220,6 +253,7 @@ class App extends Component {
                   onAddRoom={() => this.addRoomHandler()}
                   onCheckRoom={id => this.checkRoomHandler(id)}
                   loading={loading}
+                  error={error}
                 />
               )}
             />
@@ -267,6 +301,25 @@ class App extends Component {
                 } else {
                   return (<Spectator />);
                 }
+              }}
+            />
+
+            <Match
+              exactly pattern='/dead'
+              render={() => {
+
+                const {dead} = this.state;
+
+                if (dead) {
+                  return (<Dead />);
+                } else {
+                  return (
+                    <Redirect to={{
+                      pathname: `/menu`
+                    }} />
+                  );
+                }
+
               }}
             />
 
