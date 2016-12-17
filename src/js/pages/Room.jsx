@@ -13,7 +13,7 @@ class Room extends Component {
 
   props: {
     playersInMyRoom: Array<Player>,
-    roomId: string,
+    room: string,
     myId: string,
     onStartGame: () => void
   }
@@ -43,9 +43,15 @@ class Room extends Component {
     //als ik niet de eerste in de room ben, dan ben ik niet de host
     if (myId !== playersInMyRoom[0].id) return;
 
-    return (
-      <button onClick={() => onStartGame()}>Start de game!</button>
-    );
+    if (playersInMyRoom.length < 2) { //min x personen om te starten
+      return (
+        <button disabled>Waiting for more players</button>
+      );
+    } else {
+      return (
+      <button onClick={() => onStartGame()}>Start game</button>
+      );
+    }
   }
 
   renderHostName() {
@@ -63,12 +69,12 @@ class Room extends Component {
 
   render() {
 
-    const {roomId} = this.props;
+    const {room} = this.props;
 
     return (
       <div>
         <header>
-          <h1 className='title'>Code: {roomId}</h1>
+          <h1 className='title'>Code: {room}</h1>
         </header>
 
         <section>

@@ -5,16 +5,15 @@ import {Match, Redirect} from 'react-router';
 import Router from 'react-router/BrowserRouter';
 import IO from 'socket.io-client';
 
-import {Menu, Test, TakePicture, Room, Game} from '../pages/';
+import {
+  Menu,
+  TakePicture,
+  Room,
+  BombHolder,
+  Spectator
+} from '../pages/';
 
 let router: Object = {};
-
-type state = {
-  players: Array<Object>,
-  playersInMyRoom: Array<Object>,
-  roomId: string,
-  loading: boolean
-}
 
 type Player = {
   id: string,
@@ -22,12 +21,21 @@ type Player = {
   room: string
 }
 
+type state = {
+  players: Array<Player>,
+  playersInMyRoom: Array<Player>,
+  room: string,
+  bombHolder: string,
+  loading: boolean
+}
+
 class App extends Component {
 
   state: state = {
     players: [],
     playersInMyRoom: [],
-    roomId: ``,
+    room: ``,
+    bombHolder: ``,
     loading: true
   }
 
@@ -51,10 +59,12 @@ class App extends Component {
     this.socket.on(`joined`, player => this.joinedWSHandler(player));
     this.socket.on(`getRoomData`, data => this.roomDataWSHandler(data));
 
-    this.socket.on(`found`, room => this.foundWSHandler(room));
-    this.socket.on(`notFound`, room => this.notFoundWSHandler(room));
+    this.socket.on(`found`, id => this.foundWSHandler(id));
+    this.socket.on(`notFound`, id => this.notFoundWSHandler(id));
+    this.socket.on(`busy`, id => this.busyWSHandler(id));
 
     this.socket.on(`pictureTaken`, player => this.pictureTakenWSHandler(player));
+    this.socket.on(`startGame`, bombHolder => this.startGameWSHandler(bombHolder));
   }
 
   setRouter(setRouter: Object) {
@@ -65,17 +75,26 @@ class App extends Component {
     console.log(`Init die peer`);
   }
 
+  busyWSHandler(id: string) {
+    console.log(`Room ${id} is al bezig met spelen`);
+  }
+
+  startGameWSHandler(bombHolder: string) {
+    const {room} = this.state;
+    this.setState({bombHolder});
+    router.transitionTo(`/rooms/${room}/game`);
+  }
+
   roomDataWSHandler(data: {room: string, players: Array<Player>}) {
 
     console.log(`data from the whole room because i just joined`);
-    console.log(data);
 
-    let {roomId, playersInMyRoom} = this.state;
+    let {room, playersInMyRoom} = this.state;
 
-    roomId = data.room;
+    room = data.room;
     playersInMyRoom = data.players;
 
-    this.setState({roomId, playersInMyRoom});
+    this.setState({room, playersInMyRoom});
   }
 
   pictureTakenWSHandler(player: Player) {
@@ -90,20 +109,24 @@ class App extends Component {
     this.setState({playersInMyRoom});
   }
 
-  foundWSHandler(roomId: string) {
-    this.socket.emit(`joinRoom`, roomId);
-    this.setState({roomId});
-    router.transitionTo(`/rooms/${roomId}/picture`);
+  foundWSHandler(id: string) {
+    this.socket.emit(`joinRoom`, id);
+
+    let {room} = this.state;
+    room = id;
+    this.setState({room});
+
+    router.transitionTo(`/rooms/${id}/picture`);
   }
 
-  notFoundWSHandler(room: string) {
-    console.log(`Room ${room} werd niet gevonden!`);
+  notFoundWSHandler(id: string) {
+    console.log(`Room ${id} werd niet gevonden!`);
   }
 
   joinedWSHandler(player: {id: string, picture: string, room: string}) {
-    const {roomId, playersInMyRoom} = this.state;
+    const {room, playersInMyRoom} = this.state;
 
-    console.log(`${player.id} joined room ${roomId}`);
+    console.log(`${player.id} joined room ${room}`);
 
     playersInMyRoom.push(player);
     this.setState({playersInMyRoom});
@@ -144,37 +167,36 @@ class App extends Component {
 
     this.socket.emit(`createRoom`);
 
-    this.socket.on(`roomCreated`, ({player, roomId}) => {
+    this.socket.on(`roomCreated`, ({player, room}) => {
       const {playersInMyRoom} = this.state;
       playersInMyRoom.push(player);
 
-      this.setState({roomId});
-      router.transitionTo(`/rooms/${roomId}/picture`);
+      this.setState({room});
+      router.transitionTo(`/rooms/${room}/picture`);
     });
 
   }
 
-  checkRoomHandler(room: string) {
-    this.socket.emit(`checkRoom`, room);
+  checkRoomHandler(id: string) {
+    this.socket.emit(`checkRoom`, id);
   }
 
   takePictureHandler(myPictureData: string) {
-    const {roomId} = this.state;
-
+    const {room} = this.state;
     this.socket.emit(`newPicture`, myPictureData);
-    router.transitionTo(`/rooms/${roomId}/wait`);
+    router.transitionTo(`/rooms/${room}/wait`);
   }
 
   startGameHandler() {
-    console.log(`socket emitten naar alle players in de room als hier op geklikt wordt om ze in de game state te pushen`);
-    this.socket.emit(`startGame`);
+    const {room} = this.state;
+    this.socket.emit(`startGame`, room);
   }
 
   render() {
 
-    const {players, playersInMyRoom, roomId, loading} = this.state;
+    const {players, playersInMyRoom, room, loading} = this.state;
 
-    console.log(loading);
+    console.log(room);
 
     return (
       <Router>
@@ -196,7 +218,7 @@ class App extends Component {
                   setRouter={this.setRouter(router)}
                   players={players}
                   onAddRoom={() => this.addRoomHandler()}
-                  onCheckRoom={room => this.checkRoomHandler(room)}
+                  onCheckRoom={id => this.checkRoomHandler(id)}
                   loading={loading}
                 />
               )}
@@ -224,7 +246,7 @@ class App extends Component {
                 } else {
 
                   return (<Room
-                    roomId={roomId}
+                    room={room}
                     myId={this.socket.id}
                     playersInMyRoom={playersInMyRoom}
                     onStartGame={() => this.startGameHandler()}
@@ -236,14 +258,16 @@ class App extends Component {
 
             <Match
               exactly pattern='/rooms/:id/game'
-              render={() => (
-                <Game />
-              )}
-            />
+              render={() => {
 
-            <Match
-              exactly pattern='/test'
-              component={Test}
+                const {bombHolder} = this.state;
+
+                if (bombHolder === this.socket.id) {
+                  return (<BombHolder />);
+                } else {
+                  return (<Spectator />);
+                }
+              }}
             />
 
             <Match exactly pattern='/*' render={() => {

@@ -32,8 +32,6 @@ class Menu extends Component {
 
   submitCode(e: Object) {
     e.preventDefault();
-    console.log(`Submit`);
-
     const {onCheckRoom} = this.props;
     onCheckRoom(this.code.value);
   }
