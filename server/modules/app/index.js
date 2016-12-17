@@ -3,6 +3,7 @@ module.exports.register = (server, options, next) => {
   const io = require(`socket.io`)(server.listener);
 
   let players = [];
+  const codes = [];
 
   const rooms = io.sockets.adapter.rooms;
 
@@ -28,20 +29,38 @@ module.exports.register = (server, options, next) => {
     console.log(players);
 
     socket.on(`createRoom`, () => {
-      const code = Math.floor(Math.random() * 9000) + 1000; //generate random nummer tussen 1000 en 9999
+      let number = Math.floor(Math.random() * 9000) + 1000; //generate random nummer tussen 1000 en 9999
 
-      socket.join(code);
+      //tussen alle codes kijken of de gegenereerde code al bestaat
+      //als die bestaat -> nieuwe code genereren tot er eentje gemaakt wordt dat nog niet bestaat
+      codes.find(code => {
+        while (code === number) {
+          console.log(`code bestaat al - opnieuw uitvoeren`);
+          number = Math.floor(Math.random() * 9000) + 1000;
+        }
+      });
+
+      //hier weet je zeker dat het nummer nog niet bestaat
+
+      //gegenereed nummer bij de codes steken
+      codes.push(number);
+
+      console.log(codes);
+      //room joinen
+      socket.join(number);
 
       const data = {
         player: player,
-        roomId: code
+        roomId: number
       };
 
+      //jezelf in de players zoeken
       const me = players.find(p => {
         if (p.id === playerId) return p;
       });
 
-      me.room = code;
+      //jouw room op het gegenereerd nummer zetten
+      me.room = number;
 
       socket.emit(`roomCreated`, data);
     });
@@ -69,7 +88,6 @@ module.exports.register = (server, options, next) => {
         console.log(player, `in my room`);
         //dit id zoeken in alle players en dat object pushen naar playersInMyRoom
         players.map(p => {
-          console.log(player, p.id);
           if (p.id === player) playersInMyRoom.push(p);
         });
       });

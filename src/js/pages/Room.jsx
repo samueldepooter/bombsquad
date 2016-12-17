@@ -38,6 +38,8 @@ class Room extends Component {
   renderStartButton() {
     const {myId, playersInMyRoom, onStartGame} = this.props;
 
+    if (!playersInMyRoom[0]) return;
+
     //als ik niet de eerste in de room ben, dan ben ik niet de host
     if (myId !== playersInMyRoom[0].id) return;
 

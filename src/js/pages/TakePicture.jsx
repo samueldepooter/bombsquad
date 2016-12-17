@@ -94,7 +94,7 @@ class TakePicture extends Component {
       <section>
 
         <div className='camera'>
-          <input type='file' className='takePicture' accept='image/*' onChange={e => this.onTakePictureChange(e)} />
+          <input type='file' className='takePicture' capture accept='image/*' onChange={e => this.onTakePictureChange(e)} />
           <video className='video' autoPlay>Taking picture is not available!</video>
         </div>
 
