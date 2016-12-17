@@ -65,13 +65,58 @@ module.exports.register = (server, options, next) => {
       socket.emit(`roomCreated`, data);
     });
 
-    socket.on(`startGame`, id => {
+    socket.on(`next`, data => {
+      //nieuwe bombHolder zoeken
+
+      const room = {
+        id: data.room
+      };
+
+      //als je dood bent, jezelf uit de room verwijderen
+      if (data.dead) socket.leave(data.room);
+
+      //eigen room ophalen voor de players te vinden
+      const mySocketRoom = socketRooms[data.room];
+      //als je als laatste leaved dan bestaat de socketroom niet meer, kan gebeuren als 1 vd 2 laatste players wegvalt
+      if (!mySocketRoom) return;
+
+      const playersInMyRoom = [];
+      Object.keys(mySocketRoom.sockets).forEach(socketPlayer => {
+        players.map(p => {
+          if (p.id === socketPlayer) playersInMyRoom.push(p);
+        });
+      });
+
+      //als playersInMyRoom nog maar 1 speler bevat dan heeft die gewonnen
+      if (playersInMyRoom.length === 1) {
+        console.log(`${playersInMyRoom[0].id} wins!`);
+        io.in(data.room).emit(`winner`);
+        return;
+      }
+
+      //in playersInMyRoom zoeken naar een random player -> deze krijgt de bom
+      const bombHolder = playersInMyRoom[Math.floor(Math.random() * playersInMyRoom.length)];
+
+      //timeout van 3s vooraleer het terug begint
+      setTimeout(() => {
+        //tijd aanmaken voor de room en degene die met de bom start meegeven
+        const time = 5;
+        const timer = new Timer(io, bombHolder, room, time);
+        //tijd starten
+        timer.start();
+        io.in(data.room).emit(`startGame`, {bombHolder, time});
+      }, 3000);
+
+
+    });
+
+    socket.on(`startGame`, () => {
 
       //room op starten zetten zodat je niet meer kan joinen
       room.started = true;
 
       //eigen room ophalen voor de players te vinden
-      const mySocketRoom = socketRooms[id];
+      const mySocketRoom = socketRooms[room.id];
       const playersInMyRoom = [];
       Object.keys(mySocketRoom.sockets).forEach(player => {
         players.map(p => {
@@ -80,14 +125,15 @@ module.exports.register = (server, options, next) => {
       });
 
       //in playersInMyRoom zoeken naar een random player -> deze krijgt de bom
-      const bombHolder = playersInMyRoom[Math.floor(Math.random() * playersInMyRoom.length)].id;
+      const bombHolder = playersInMyRoom[Math.floor(Math.random() * playersInMyRoom.length)];
 
       //tijd aanmaken voor de room en degene die met de bom start meegeven
-      const timer = new Timer(io, bombHolder, room, 5);
+      const time = 10;
+      const timer = new Timer(io, bombHolder, room, time);
       //tijd starten
       timer.start();
 
-      io.in(id).emit(`startGame`, bombHolder);
+      io.in(room.id).emit(`startGame`, {bombHolder, time});
     });
 
     socket.on(`newPicture`, picture => {
@@ -95,14 +141,15 @@ module.exports.register = (server, options, next) => {
       io.in(player.room).emit(`pictureTaken`, player);
     });
 
-    socket.on(`joinRoom`, id => {
+    socket.on(`join`, id => {
 
       //hier is de room zeker nog niet gestart -> je mag joinen
       socket.join(id);
 
-      //de room die je joined opvragen van socket
+      //de room die je joined opvragen van socket om players te weten te komen
       const mySocketRoom = socketRooms[id];
 
+      //lege array om alle players in te steken
       const playersInMyRoom = [];
 
       //elke player (is enkel het id) die in de room zit pushen naar playersInMyRoom array
@@ -114,6 +161,7 @@ module.exports.register = (server, options, next) => {
         });
       });
 
+      //eigen room zetten naar het id dat je gejoined bent
       player.room = id;
 
       const roomData = {

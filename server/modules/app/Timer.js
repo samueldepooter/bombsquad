@@ -1,10 +1,27 @@
+//@flow
+
+type BombHolder = {
+  id: string,
+  picture: string,
+  room: string
+}
+
+type Room = {
+  id: string
+}
+
 class Timer {
-  constructor(io, bombHolder, room, time) {
+
+  io: Object
+  bombHolder: BombHolder
+  room: Room
+  time: number
+
+  constructor(io: Object, bombHolder: BombHolder, room: Room, time: number) {
     this.io = io;
     this.bombHolder = bombHolder;
     this.room = room;
     this.time = time;
-    this.dead = false;
   }
 
   start() {
@@ -19,8 +36,7 @@ class Timer {
       this.io.in(this.room.id).emit(`time`, data);
 
       if (this.time <= 0) {
-        console.log(`Player ${this.bombHolder} is dood!`);
-        this.dead = true;
+        console.log(`Player ${this.bombHolder.id} is dood!`);
         clearInterval(timer);
         return;
       }
