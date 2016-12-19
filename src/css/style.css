@@ -311,6 +311,7 @@ input[placeholder] {
 }
 
 .coolBorder {
+  margin-top: -2px;
   height: 2rem;
   width: 100%;
   background-image: url(../assets/red_border.svg);
@@ -381,6 +382,77 @@ input[placeholder] {
   padding: 3rem 0;
 }
 
+.room .startbutton .button {
+  position: relative;
+  padding: 2rem 6rem;
+}
+
 .error {
   color: red;
+}
+
+.startButtonText {
+  margin-left: -3.5rem;
+  /*position:absolute;*/
+}
+
+.dotAnimationWrapper {
+  right: 4.5rem;
+  top: 2rem;
+  display: inline-block;
+  position: absolute;
+}
+
+.dot1, .dot2, .dot3 {
+  position: absolute;
+  animation-name: wait;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease;
+}
+
+.dot2 {
+  margin-left: 1rem;
+  animation-delay: .1s;
+}
+
+.dot3 {
+  margin-left: 2rem;
+  animation-delay: .2s;
+}
+
+.roomCode {
+  width: 0;
+  outline: none;
+  background-color: none;
+  opacity: 0;
+  border: none;
+  height: 0;
+}
+
+@keyframes wait {
+
+  0% {
+    transform: translateY(0);
+  }
+
+  40% {
+    transform: translateY(-1rem);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.copyNotification {
+  width: 100%;
+  height: 7rem;
+  background-color: #f43d25;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  bottom: -7rem;
+  transition: all 0.7s ease;
 }

@@ -21,15 +21,16 @@ class TakePicture extends Component {
 
   componentDidMount() {
 
+    this.canvas = ((document.querySelector(`.pictureCanvas`): any): HTMLCanvasElement);
+    this.ctx = this.canvas.getContext(`2d`);
+
     if (this.onPhone) {
       this.picturebutton.style.display = `none`;
 
     } else {
       this.picturebutton.style.display = `inline-block`;
-
       this.video = ((document.querySelector(`.video`): any): HTMLVideoElement);
-      this.canvas = ((document.querySelector(`.pictureCanvas`): any): HTMLCanvasElement);
-      this.ctx = this.canvas.getContext(`2d`);
+
       this.videoHandler();
       this.video.addEventListener(`click`, () => this.snapshotHandler());
     }
