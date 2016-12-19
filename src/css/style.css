@@ -90,6 +90,7 @@ main {
 
 .button {
   background-color: #ffb510;
+  font-size: 2.5rem;
   padding: 2rem 4rem;
   color: white;
   font-weight: bolder;
@@ -99,6 +100,7 @@ main {
   display: inline-block;
   font-family: Montserrat, sans-serif;
   box-shadow: 0 10px 0 rgba(0, 0, 0, .25);
+  outline: none;
 }
 
 .formwrapperMenu {
@@ -125,6 +127,7 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
+
 }
 
 .menu .menuform {
@@ -179,6 +182,9 @@ input[placeholder] {
 
 .picture {
   font-size: 2rem;
+  width: 41.4rem;
+  height: 73.6rem;
+  overflow-y: hidden;
 }
 
 .globalheader {
@@ -200,7 +206,7 @@ input[placeholder] {
 }
 
 .picture .globalheader {
-  border-bottom: 10px solid #191819;
+  /* border-bottom: 10px solid #191819; */
 }
 
 .picture .screw {
@@ -232,7 +238,20 @@ input[placeholder] {
   width: 100%;
 }
 
-.picturebutton {
+.camera {
+  height: 85%;
+}
+
+.mobilePictureButtonWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.picturebutton, .takePictureLabel {
   display: inline-block;
   background-color: white;
   border-radius: 10rem;
@@ -243,6 +262,20 @@ input[placeholder] {
   background-position: center center;
   background-size: 55%;
   background-repeat: no-repeat;
+  box-shadow: 0 10px 0 rgba(0, 0, 0, .1);
+}
+
+.takePictureLabel {
+  transform: scale(2, 2);
+}
+
+.takePictureButton {
+  width: 10rem;
+  height: 10rem;
+  background-color: yellow;
+  transform: scale(2, 2);
+  display: none;
+  outline: none;
 }
 
 .room {

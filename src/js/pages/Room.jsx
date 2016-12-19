@@ -20,17 +20,11 @@ class Room extends Component {
 
   renderPlayers() {
     const {playersInMyRoom, myId} = this.props;
+    console.log(myId);
 
     return playersInMyRoom.map((player, i) => {
-      let name = player.id;
-      if (player.id === myId) name = `Ik`;
       return (
-        <li className='player' key={i}>
-          <p>{name}</p>
-          <div className='playerPictureWrap'>
-            <img className='playerPicture' src={player.picture} />
-          </div>
-        </li>
+        <li className='playerPicture' style={{backgroundImage: `url(${player.picture})`}} key={i}></li>
       );
     });
   }
@@ -43,7 +37,7 @@ class Room extends Component {
     //als ik niet de eerste in de room ben, dan ben ik niet de host
     if (myId !== playersInMyRoom[0].id) return;
 
-    if (playersInMyRoom.length < 2) { //min x personen om te starten
+    if (playersInMyRoom.length < 0) { //min x personen om te starten
       return (
         <button disabled>Waiting for more players</button>
       );

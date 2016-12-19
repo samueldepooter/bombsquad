@@ -13,22 +13,29 @@ type Props = {
 class TakePicture extends Component {
 
   props: Props
-
   video: HTMLVideoElement
   canvas: HTMLCanvasElement
   ctx: ?CanvasRenderingContext2D
+  onPhone: boolean;
+  picturebutton: HTMLElement;
 
   componentDidMount() {
 
-    this.video = ((document.querySelector(`.video`): any): HTMLVideoElement);
-    this.canvas = ((document.querySelector(`.pictureCanvas`): any): HTMLCanvasElement);
-    this.ctx = this.canvas.getContext(`2d`);
+    if (this.onPhone) {
+      this.picturebutton.style.display = `none`;
 
-    this.videoHandler();
+    } else {
+      this.picturebutton.style.display = `inline-block`;
 
-    this.video.addEventListener(`click`, () => this.snapshotHandler());
-
+      this.video = ((document.querySelector(`.video`): any): HTMLVideoElement);
+      this.canvas = ((document.querySelector(`.pictureCanvas`): any): HTMLCanvasElement);
+      this.ctx = this.canvas.getContext(`2d`);
+      this.videoHandler();
+      this.video.addEventListener(`click`, () => this.snapshotHandler());
+    }
   }
+
+
 
   videoHandler() {
     navigator.getUserMedia  = navigator.getUserMedia ||
@@ -137,19 +144,71 @@ class TakePicture extends Component {
     onTakePicture(data);
   }
 
+  checkOnPhone() {
+    if (navigator.userAgent.match(/Android/i)
+      || navigator.userAgent.match(/webOS/i)
+      || navigator.userAgent.match(/iPhone/i)
+      || navigator.userAgent.match(/iPad/i)
+      || navigator.userAgent.match(/iPod/i)
+      || navigator.userAgent.match(/BlackBerry/i)
+      || navigator.userAgent.match(/Windows Phone/i)
+    ) {
+      this.onPhone = true;
+    }
+    else {
+      this.onPhone = false;
+    }
+
+    return this.onPhone;
+  }
+
+  imageSourceRender() {
+
+    if (this.checkOnPhone()) {
+      return (
+        <div className='mobilePictureButtonWrapper'>
+          <label htmlFor='pictureButton' className='takePictureLabel'></label>
+          <input type='file' className='takePictureButton' id='pictureButton' capture accept='image/*' onChange={e => this.onTakePictureChange(e)} />
+        </div>
+      );
+    } else {
+      return (
+      <div>
+        <img src='' className='myImg' />
+        <video className='video' width='85rem' autoPlay>Taking picture is not available!</video>
+      </div>);
+    }
+  }
+
   render() {
 
     return (
-      <section>
-
+      <section className='picture phonewrapper'>
+        <header className='globalheader'>
+          <div className='screw screwleft'></div>
+          <h2>Take a selfie! <br /> This will be your avatar.</h2>
+          <div className='screw screwright'></div>
+        </header>
         <div className='camera'>
-          <img src='' className='myImg' />
-          <input type='file' className='takePicture' capture accept='image/*' onChange={e => this.onTakePictureChange(e)} />
-          <video className='video' autoPlay>Taking picture is not available!</video>
+        {this.imageSourceRender()}
         </div>
-
         <canvas className='pictureCanvas'></canvas>
+        <div className='picturebuttonwrapper'>
+          <button className='picturebutton' ref={picturebutton => this.picturebutton = picturebutton} onClick={() => this.snapshotHandler()}></button>
+        </div>
       </section>
+
+
+      // <section>
+      //
+      //   <div className='camera'>
+      //     <img src='' className='myImg' />
+      //     <input type='file' className='takePicture' capture accept='image/*' onChange={e => this.onTakePictureChange(e)} />
+      //     <video className='video' autoPlay>Taking picture is not available!</video>
+      //   </div>
+      //
+      //   <canvas className='pictureCanvas'></canvas>
+      // </section>
     );
   }
 
