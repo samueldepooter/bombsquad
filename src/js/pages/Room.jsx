@@ -40,7 +40,7 @@ class Room extends Component {
     //als ik niet de eerste in de room ben, dan ben ik niet de host
     if (myId !== playersInMyRoom[0].id) return;
 
-    if (playersInMyRoom.length < 2) { //min x personen om te starten
+    if (playersInMyRoom.length < 0) { //min x personen om te starten
       return (
         <button disabled className='button'><span className='startButtonText'> Waiting for more players </span><div className='dotAnimationWrapper'> <span className='dot1'>.</span><span className='dot2'>.</span><span className='dot3'>.</span> </div> </button>
       );
@@ -98,6 +98,9 @@ class Room extends Component {
 
         <div className='codewrapper'>
           <section className='code'>
+            <header className='hidden'>
+              <h3>Room Code</h3>
+            </header>
             <ul className='codelist' >
               <li className='codenumber'>{roomIdString.charAt(0)}</li>
               <li className='codenumber'>{roomIdString.charAt(1)}</li>
@@ -111,7 +114,7 @@ class Room extends Component {
         <div className='coolBorder'></div>
 
         <section className='playersWrapper'>
-          <h2 className='subtitle'>Players: {playersInMyRoom.length}</h2>
+          <h3 className='subtitle'>Players: {playersInMyRoom.length}</h3>
             <ul className='players'>
               {this.renderPlayers()}
             </ul>

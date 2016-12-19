@@ -52,12 +52,10 @@ class Menu extends Component {
     return (
 
     <section className='menu phonewrapper'>
-
       <header className='logoheader'>
-        <h1 className='logo'><span className='hidden'>bomb squad</span></h1>
+        <h2 className='logo'><span className='hidden'>Bomb Squad Logo</span></h2>
       </header>
-
-      <section className='formwrapperMenu'>
+      <div className='formwrapperMenu'>
         <div>
         <button to={`/rooms/create`} className='button' onClick={() => onAddRoom()}> Create a room</button>
         </div>
@@ -70,7 +68,7 @@ class Menu extends Component {
             <p className='error'>{error}</p>
           </div>
         </form>
-      </section>
+      </div>
 
       <div className='screw topleft'></div>
       <div className='screw topright'></div>

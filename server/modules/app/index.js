@@ -128,7 +128,7 @@ module.exports.register = (server, options, next) => {
       const bombHolder = playersInMyRoom[Math.floor(Math.random() * playersInMyRoom.length)];
 
       //tijd aanmaken voor de room en degene die met de bom start meegeven
-      const time = 10;
+      const time = 1000;
       const timer = new Timer(io, bombHolder, room, time);
       //tijd starten
       timer.start();
