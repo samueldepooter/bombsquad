@@ -23,15 +23,16 @@ class Menu extends Component {
 
   render() {
 
-    const {onAddRoom, error, players} = this.props;
+    const {onAddRoom, error} = this.props;
 
     return (
 
     <section className='menu phonewrapper'>
-      <div className='loader'>One moment... fetching all those bombers</div>
+
       <header className='logoheader'>
         <h1 className='logo'><span className='hidden'>bomb squad</span></h1>
       </header>
+
       <section className='formwrapperMenu'>
         <div>
         <button to={`/rooms/create`} className='button' onClick={() => onAddRoom()}> Create a room</button>

@@ -19,14 +19,12 @@ class Room extends Component {
   }
 
   renderPlayers() {
-    const {playersInMyRoom, myId} = this.props;
+    const {playersInMyRoom} = this.props;
 
     return playersInMyRoom.map((player, i) => {
-      let name = player.id;
-      if (player.id === myId) name = `Ik`;
       return (
         <li className='player' key={i}>
-          <p>{name}</p>
+          {/* <p>{name}</p> */}
           <div className='playerPictureWrap'>
             <img className='playerPicture' src={player.picture} />
           </div>
@@ -69,7 +67,7 @@ class Room extends Component {
 
   render() {
 
-    const {room} = this.props;
+    const {room, playersInMyRoom} = this.props;
     const roomIdString = room.toString();
 
     return (
@@ -96,22 +94,8 @@ class Room extends Component {
         <div className='coolBorder'></div>
 
         <section className='playersWrapper'>
-          <h2 className='subtitle'>Players:</h2>
+          <h2 className='subtitle'>Players: {playersInMyRoom.length}</h2>
             <ul className='players'>
-              {this.renderPlayers()}
-              {this.renderPlayers()}
-              {this.renderPlayers()}
-              {this.renderPlayers()}
-              {this.renderPlayers()}
-              {this.renderPlayers()}
-              {this.renderPlayers()}
-              {this.renderPlayers()}
-              {this.renderPlayers()}
-              {this.renderPlayers()}
-              {this.renderPlayers()}
-              {this.renderPlayers()}
-              {this.renderPlayers()}
-              {this.renderPlayers()}
               {this.renderPlayers()}
             </ul>
         </section>

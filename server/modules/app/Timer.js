@@ -1,3 +1,5 @@
+let timer;
+
 class Timer {
 
   constructor(io, bombHolder, room, time) {
@@ -7,8 +9,12 @@ class Timer {
     this.time = time;
   }
 
-  start() {
-    const timer = setInterval(() => {
+  start(bombHolder = this.bombHolder, time = this.time) {
+
+    this.bombHolder = bombHolder;
+    this.time = time;
+
+    timer = setInterval(() => {
 
       const data = {
         time: this.time,
@@ -20,7 +26,7 @@ class Timer {
 
       if (this.time <= 0) {
         console.log(`Player ${this.bombHolder.id} is dood!`);
-        clearInterval(timer);
+        clearInterval(this.timer);
         return;
       }
 
@@ -28,6 +34,11 @@ class Timer {
       this .time--;
 
     }, 1000);
+  }
+
+  reset() {
+    clearInterval(timer);
+    console.log(`STOP the timer`);
   }
 }
 

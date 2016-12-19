@@ -26,6 +26,7 @@ type Player = {
 type state = {
   players: number,
   playersInMyRoom: Array<Player>,
+  possibleHolders: Array<string>,
   room: string,
   bombHolder: Object,
   loading: boolean,
@@ -40,6 +41,7 @@ class App extends Component {
   state: state = {
     players: 0,
     playersInMyRoom: [],
+    possibleHolders: [],
     room: ``,
     bombHolder: {},
     loading: true,
@@ -74,9 +76,12 @@ class App extends Component {
     this.socket.on(`busy`, id => this.busyWSHandler(id));
 
     this.socket.on(`pictureTaken`, player => this.pictureTakenWSHandler(player));
-    this.socket.on(`startGame`, bombHolder => this.startGameWSHandler(bombHolder));
+    this.socket.on(`startGame`, data => this.startGameWSHandler(data));
+    this.socket.on(`randomBombHolder`, data => this.setBombHolderWSHandler(data));
+    this.socket.on(`newBombHolder`, data => this.setBombHolderWSHandler(data));
     this.socket.on(`time`, data => this.timeWSHandler(data));
     this.socket.on(`winner`, () => this.winnerWSHandler());
+    this.socket.on(`passBomb`, possibleHolders => this.passBombWSHandler(possibleHolders));
   }
 
   setRouter(setRouter: Object) {
@@ -87,6 +92,10 @@ class App extends Component {
     console.log(`Init die peer`);
   }
 
+  passBombWSHandler(possibleHolders: Array<string>) {
+    this.setState({possibleHolders});
+  }
+
   winnerWSHandler() {
     let {winner} = this.state;
     winner = true;
@@ -95,36 +104,41 @@ class App extends Component {
   }
 
   timeWSHandler(data: {time: number, bombHolder: Object}) {
+
     let {time} = this.state;
+    const {room} = this.state;
+
     //checken of jij de bom hebt
     if (data.bombHolder.id === this.socket.id) {
+
       //jij hebt de bom
       console.log(data.time, `You are holding the bomb`);
+
       //als je tijd op is ben je zelf dood
       if (data.time <= 0) {
 
-        //TODO: alle variabelen resetten als je dood bent
         let {dead} = this.state;
         dead = true;
         this.setState({dead});
 
-        const nextData = {
-          dead: dead,
-          room: data.bombHolder.room,
-          id: data.bombHolder.id
-        };
-
         //jezelf uit de room verwijderen
-        this.socket.emit(`next`, nextData);
+        this.socket.emit(`leave`);
+        this.socket.emit(`randomBombHolder`, room);
 
         console.log(`YOU are dead`);
         router.transitionTo(`/dead`);
       }
+
     } else {
+
       //jij hebt niet de bom
       console.log(data.time, `Currently holding the bomb: ${data.bombHolder.id}`);
+
       //als de tijd op is, is deze speler dood
-      if (data.time <= 0) console.log(`Player ${data.bombHolder.id} is dead`);
+      if (data.time <= 0) {
+        console.log(`Player ${data.bombHolder.id} is dead`);
+      }
+
     }
 
     time = data.time;
@@ -147,6 +161,17 @@ class App extends Component {
     });
 
     router.transitionTo(`/rooms/${room}/game`);
+  }
+
+  setBombHolderWSHandler(data: {bombHolder: Object, time: number}) {
+
+    console.log(`New bomb holder = ${data.bombHolder.id}`);
+
+    this.setState({
+      possibleHolders: [],
+      bombHolder: data.bombHolder,
+      time: data.time
+    });
   }
 
   roomDataWSHandler(data: {room: string, players: Array<Player>}) {
@@ -255,6 +280,18 @@ class App extends Component {
     this.socket.emit(`startGame`);
   }
 
+  openVaultHandler(e: Object) {
+    e.preventDefault();
+    this.socket.emit(`vaultOpen`, this.socket.id);
+  }
+
+  passBombHandler(player: Player) {
+    //possibleHolders leegmaken zodat de juiste render getriggered wordt
+    const newPossibleHolders = [];
+    this.setState({possibleHolders: newPossibleHolders});
+    this.socket.emit(`newBombHolder`, player);
+  }
+
   render() {
 
     const {players, playersInMyRoom, room, loading, error, time} = this.state;
@@ -322,17 +359,26 @@ class App extends Component {
               exactly pattern='/rooms/:id/game'
               render={() => {
 
-                const {bombHolder} = this.state;
+                const {bombHolder, possibleHolders} = this.state;
 
                 if (bombHolder.id === this.socket.id) {
+
                   return (<BombHolder
                     time={time}
+                    onOpenVault={e => this.openVaultHandler(e)}
+                    onPassBomb={player => this.passBombHandler(player)}
+                    possibleHolders={possibleHolders}
                   />);
+
                 } else {
+
                   return (<Spectator
                     bombHolder={bombHolder}
                     time={time}
+                    possibleHolders={possibleHolders}
+                    id={this.socket.id}
                   />);
+
                 }
               }}
             />
