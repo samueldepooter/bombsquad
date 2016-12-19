@@ -104,7 +104,7 @@ main {
 }
 
 .formwrapperMenu {
-  margin-top: 15rem;
+  margin-top: 14rem;
   z-index: 999;
   width: 30rem;
   display: flex;
@@ -113,6 +113,7 @@ main {
 }
 
 .or {
+  font-size: 2rem;
   margin: 2rem auto;
   color: #4e4c51;
 }
@@ -388,6 +389,9 @@ input[placeholder] {
 }
 
 .error {
+  margin-top: 2rem;
+  font-size: 2rem;
+  text-align: center;
   color: red;
 }
 

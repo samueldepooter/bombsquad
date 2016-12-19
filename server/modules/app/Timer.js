@@ -5,14 +5,12 @@ class Timer {
     this.bombHolder = bombHolder;
     this.room = room;
     this.time = time;
-    this.totalTime = time;
   }
 
   start() {
     const timer = setInterval(() => {
 
       const data = {
-        totalTime: this.totalTime,
         time: this.time,
         bombHolder: this.bombHolder
       };

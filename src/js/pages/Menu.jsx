@@ -17,6 +17,10 @@ type Props = {
 
 class Menu extends Component {
 
+  state = {
+    checkCode: ``
+  };
+
   props: Props;
   code: Object;
 
@@ -37,10 +41,17 @@ class Menu extends Component {
     onCheckRoom(this.code.value);
   }
 
+  limitInput() {
+    if (this.code.value > 4) {
+      this.code.value = this.code.value.slice(0, 4);
+    }
+    this.setState({checkCode: this.code.value});
+  }
+
   render() {
 
     const {onAddRoom, loading, error} = this.props;
-    console.log(error);
+    const {checkCode} = this.state;
 
     const loader = document.querySelector(`.loader`);
     if (loader) {
@@ -64,9 +75,9 @@ class Menu extends Component {
           <label htmlFor='code'>Join a room</label>
           <div className='codeinputwrapper'>
             <label htmlFor='code' className='lockicon'></label>
-            <input ref={code => this.code = code} className='codeinput' id='code'  type='text' placeholder='XXXX' />
-            <p className='error'>{error}</p>
+            <input ref={code => this.code = code} onChange={() => this.limitInput()} value={checkCode}className='codeinput' id='code' min='1000' max='9999' size='4' type='number' placeholder='XXXX' />
           </div>
+          <p className='error'>{error}</p>
         </form>
       </div>
 

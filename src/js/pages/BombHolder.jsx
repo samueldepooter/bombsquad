@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 
 type Props = {
   time: number,
-  totalTime: number
 }
 
 class BombHolder extends Component {
@@ -12,7 +11,7 @@ class BombHolder extends Component {
 
   render() {
 
-    const {time, totalTime} = this.props;
+    const {time} = this.props;
 
     return (
 
@@ -34,10 +33,10 @@ class BombHolder extends Component {
           <p className='timer'>0:{time}</p>
         </div>
 
-        <div className='totalTime'>
-          <div className='currentTime' style={{width: `${100 - (time / totalTime) * 100}%`}}></div>
 
-        </div>
+        {/* <div className='totalTime'>
+          <div className='currentTime'></div>
+        </div> */}
 
         <div className='screw topleft'></div>
         <div className='screw topright'></div>
