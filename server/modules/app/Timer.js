@@ -9,7 +9,7 @@ class Timer {
     this.time = time;
   }
 
-  start(bombHolder = this.bombHolder, time = this.time) {
+  start(bombHolder, time) {
 
     this.bombHolder = bombHolder;
     this.time = time;
@@ -26,7 +26,7 @@ class Timer {
 
       if (this.time <= 0) {
         console.log(`Player ${this.bombHolder.id} is dood!`);
-        clearInterval(this.timer);
+        clearInterval(timer);
         return;
       }
 

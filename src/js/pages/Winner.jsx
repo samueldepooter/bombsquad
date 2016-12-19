@@ -4,7 +4,10 @@ import React from 'react';
 
 const Winner = () => {
   return (
-    <div>Congratulations, you're the bomb!</div>
+    <div>
+      <p>Congratulations, you're the bomb!</p>
+      <a href='/'>Menu</a>
+    </div>
   );
 };
 

@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {isEmpty} from 'lodash';
+import double from '../globals/double';
 
 type Player = {
   id: string,
@@ -11,7 +12,9 @@ type Props = {
   time: number,
   onOpenVault: () => void,
   onPassBomb: () => void,
-  possibleHolders: Array<Player>
+  possibleHolders: Array<Player>,
+  newBombHolder: Player,
+  given: boolean
 }
 
 class BombHolder extends Component {
@@ -25,7 +28,6 @@ class BombHolder extends Component {
     return possibleHolders.map((player, i) => {
       return (
         <li className='player' key={i}>
-          {/* <p>{name}</p> */}
           <div className='playerPictureWrap'>
             <img src={player.picture} className='playerPicture' onClick={() => onPassBomb(player)} />
           </div>
@@ -36,9 +38,19 @@ class BombHolder extends Component {
 
   render() {
 
-    const {time, onOpenVault, possibleHolders} = this.props;
+    const {time, onOpenVault, possibleHolders, given, newBombHolder} = this.props;
+    const doubleTime = double(time);
 
-    if (!isEmpty(possibleHolders)) {
+    if (given) {
+      return (
+        <div>
+          <p>You gave the bomb to: </p>
+          <img src={newBombHolder.picture} />
+        </div>
+      );
+    }
+
+    else if (!isEmpty(possibleHolders)) {
       return (
         <div>
           <p>Choose someone that deserves the bomb</p>
@@ -47,16 +59,47 @@ class BombHolder extends Component {
             {this.renderFutureBombHolders()}
           </ul>
 
-          <p>Time left: {time}</p>
+          <div className='timeLockDisplay'>
+            <p className='timeLeft'>Time left:</p>
+            <p className='timer'>0:{doubleTime}</p>
+          </div>
         </div>
       );
-    } else {
+    }
+
+    else {
       return (
-        <div>
-          <p>Turn your phone to unlock the door</p>
-          <p>Time left: {time}</p>
+
+        <section className='lock'>
+          <header className='turnPhone'>
+              <div className='phoneIcon'></div>
+              <h2>Turn your phone <br /> to unlock the door</h2>
+          </header>
+
+          <div className='wheelwrapper'>
+            <div className='wheelFront'>
+              <div className='status'></div>
+            </div>
+            <div className='wheelShadow'></div>
+          </div>
+
+          <div className='timeLockDisplay'>
+            <p className='timeLeft'>Time left:</p>
+            <p className='timer'>0:{doubleTime}</p>
+          </div>
+
           <button onClick={e => onOpenVault(e)}>Open vault</button>
-        </div>
+
+          {/* <div className='totalTime'>
+            <div className='currentTime'></div>
+          </div> */}
+
+          <div className='screw topleft'></div>
+          <div className='screw topright'></div>
+          <div className='screw bottomright'></div>
+          <div className='screw bottomleft'></div>
+        </section>
+
       );
     }
   }

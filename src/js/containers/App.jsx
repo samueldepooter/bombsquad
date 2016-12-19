@@ -26,14 +26,16 @@ type Player = {
 type state = {
   players: number,
   playersInMyRoom: Array<Player>,
-  possibleHolders: Array<string>,
+  possibleHolders: Array<Player>,
   room: string,
   bombHolder: Object,
-  loading: boolean,
+  newBombHolder: Object,
   time: number,
   dead: boolean,
   error: string,
-  winner: boolean
+  winner: boolean,
+  received: boolean,
+  given: boolean
 }
 
 class App extends Component {
@@ -44,11 +46,13 @@ class App extends Component {
     possibleHolders: [],
     room: ``,
     bombHolder: {},
-    loading: true,
+    newBombHolder: {},
     time: 0,
     dead: false,
     error: ``,
-    winner: false
+    winner: false,
+    received: false,
+    given: false
   }
 
   socket: Object;
@@ -82,6 +86,8 @@ class App extends Component {
     this.socket.on(`time`, data => this.timeWSHandler(data));
     this.socket.on(`winner`, () => this.winnerWSHandler());
     this.socket.on(`passBomb`, possibleHolders => this.passBombWSHandler(possibleHolders));
+    this.socket.on(`received`, time => this.receivedWSHandler(time));
+    this.socket.on(`given`, to => this.givenWSHandler(to));
   }
 
   setRouter(setRouter: Object) {
@@ -92,7 +98,21 @@ class App extends Component {
     console.log(`Init die peer`);
   }
 
-  passBombWSHandler(possibleHolders: Array<string>) {
+  givenWSHandler(to: Player) {
+    this.setState({
+      given: true,
+      newBombHolder: to
+    });
+  }
+
+  receivedWSHandler(time: number) {
+    this.setState({
+      time,
+      received: true
+    });
+  }
+
+  passBombWSHandler(possibleHolders: Array<Player>) {
     this.setState({possibleHolders});
   }
 
@@ -170,7 +190,9 @@ class App extends Component {
     this.setState({
       possibleHolders: [],
       bombHolder: data.bombHolder,
-      time: data.time
+      time: data.time,
+      received: false,
+      given: false
     });
   }
 
@@ -207,7 +229,7 @@ class App extends Component {
 
   notFoundWSHandler(id: string) {
     let {error} = this.state;
-    error = `Room ${id} was not found`;
+    error = `Room ${id} was not found :(`;
     this.setState({error});
   }
 
@@ -230,7 +252,7 @@ class App extends Component {
   }
 
   removeWSHandler(playerId: number) {
-    const {playersInMyRoom} = this.state;
+    const {playersInMyRoom, possibleHolders} = this.state;
     let {players} = this.state;
 
     players --;
@@ -239,12 +261,19 @@ class App extends Component {
       return p.id !== playerId;
     });
 
-    this.setState({
-      players,
-      playersInMyRoom: updatedPlayersInMyRoom
+    console.log(`Player [${playerId}] left`);
+
+    //player verwijderen uit possibleHolders, kan dat die er op dat moment in zat
+    const updatedPossibleHolders = possibleHolders.filter(p => {
+      return p.id !== playerId;
     });
 
-    console.log(`Player [${playerId}] left`);
+    this.setState({
+      players,
+      playersInMyRoom: updatedPlayersInMyRoom,
+      possibleHolders: updatedPossibleHolders
+    });
+
   }
 
   addAllWSHandler(allPlayers: number) {
@@ -287,14 +316,17 @@ class App extends Component {
 
   passBombHandler(player: Player) {
     //possibleHolders leegmaken zodat de juiste render getriggered wordt
-    const newPossibleHolders = [];
-    this.setState({possibleHolders: newPossibleHolders});
+    //beetje delay zodat het visueel niet kort flipt
+    setTimeout(() => {
+      this.setState({possibleHolders: []});
+    }, 250);
+
     this.socket.emit(`newBombHolder`, player);
   }
 
   render() {
 
-    const {players, playersInMyRoom, room, loading, error, time} = this.state;
+    const {players, playersInMyRoom, room, error, time} = this.state;
 
     return (
       <Router>
@@ -317,7 +349,6 @@ class App extends Component {
                   players={players}
                   onAddRoom={() => this.addRoomHandler()}
                   onCheckRoom={id => this.checkRoomHandler(id)}
-                  loading={loading}
                   error={error}
                 />
               )}
@@ -359,7 +390,7 @@ class App extends Component {
               exactly pattern='/rooms/:id/game'
               render={() => {
 
-                const {bombHolder, possibleHolders} = this.state;
+                const {bombHolder, newBombHolder, possibleHolders, received, given} = this.state;
 
                 if (bombHolder.id === this.socket.id) {
 
@@ -368,6 +399,8 @@ class App extends Component {
                     onOpenVault={e => this.openVaultHandler(e)}
                     onPassBomb={player => this.passBombHandler(player)}
                     possibleHolders={possibleHolders}
+                    given={given}
+                    newBombHolder={newBombHolder}
                   />);
 
                 } else {
@@ -377,6 +410,7 @@ class App extends Component {
                     time={time}
                     possibleHolders={possibleHolders}
                     id={this.socket.id}
+                    received={received}
                   />);
 
                 }

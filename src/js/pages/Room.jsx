@@ -18,17 +18,15 @@ class Room extends Component {
     onStartGame: () => void
   }
 
+  roomCode: Object;
+
+
   renderPlayers() {
     const {playersInMyRoom} = this.props;
 
     return playersInMyRoom.map((player, i) => {
       return (
-        <li className='player' key={i}>
-          {/* <p>{name}</p> */}
-          <div className='playerPictureWrap'>
-            <img className='playerPicture' src={player.picture} />
-          </div>
-        </li>
+        <li className='playerPicture' style={{backgroundImage: `url(${player.picture})`}} key={i}></li>
       );
     });
   }
@@ -43,26 +41,29 @@ class Room extends Component {
 
     if (playersInMyRoom.length < 2) { //min x personen om te starten
       return (
-        <button disabled>Waiting for more players</button>
+        <button disabled className='button'><span className='startButtonText'> Waiting for more players </span><div className='dotAnimationWrapper'> <span className='dot1'>.</span><span className='dot2'>.</span><span className='dot3'>.</span> </div> </button>
       );
     } else {
       return (
-      <button onClick={() => onStartGame()}>Start game</button>
+        <button className='button' onClick={() => onStartGame()}>Start game</button>
       );
     }
   }
 
-  renderHostName() {
-    const {myId, playersInMyRoom} = this.props;
+  copyCode() {
+    const notification = document.querySelector(`.copyNotification`);
+    this.showNotification(notification);
 
-    if (!playersInMyRoom[0]) return;
+    const copyTextarea = this.roomCode;
+    copyTextarea.select();
+    document.execCommand(`copy`);
+  }
 
-    let host = playersInMyRoom[0].id;
-    if (myId === playersInMyRoom[0].id) host = `Jij bent de host`;
-
-    return (
-      <p>{host}</p>
-    );
+  showNotification(node: HTMLElement) {
+    node.style.bottom = `0rem`;
+    setTimeout(() => {
+      node.style.bottom = `-7rem`;
+    }, 1500);
   }
 
   render() {
@@ -82,50 +83,35 @@ class Room extends Component {
 
         <div className='codewrapper'>
           <section className='code'>
-            <ul className='codelist'>
+            <header className='hidden'>
+              <h3>Room Code</h3>
+            </header>
+            <ul className='codelist' >
               <li className='codenumber'>{roomIdString.charAt(0)}</li>
               <li className='codenumber'>{roomIdString.charAt(1)}</li>
               <li className='codenumber'>{roomIdString.charAt(2)}</li>
               <li className='codenumber'>{roomIdString.charAt(3)}</li>
             </ul>
+            <textarea className='roomCode' ref={roomCode => this.roomCode = roomCode} value={roomIdString} readOnly></textarea>
             <button className='copyCodeButton' onClick={() => this.copyCode()}></button>
           </section>
         </div>
         <div className='coolBorder'></div>
 
         <section className='playersWrapper'>
-          <h2 className='subtitle'>Players: {playersInMyRoom.length}</h2>
-            <ul className='players'>
-              {this.renderPlayers()}
-            </ul>
+          <h3 className='subtitle'>Players: {playersInMyRoom.length}</h3>
+          <ul className='players'>
+            {this.renderPlayers()}
+          </ul>
         </section>
 
         <div className='startbutton'>
           {this.renderStartButton()}
         </div>
+        <div className='copyNotification'><p>Code copied!</p></div>
 
       </section>
 
-      // {<div>
-      //   <header>
-      //     <h1 className='title'>Code: {room}</h1>
-      //   </header>
-      //
-      //   <section>
-      //     <h2 className='subtitle'>Host</h2>
-      //     {this.renderHostName()}
-      //   </section>
-      //
-      //   <section>
-      //     <h2 className='subtitle'>Players</h2>
-      //     <ul>
-      //       {this.renderPlayers()}
-      //     </ul>
-      //   </section>
-      //
-      //   {this.renderStartButton()}
-      //
-      // </div>}
     );
   }
 

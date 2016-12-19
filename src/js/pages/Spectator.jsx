@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import double from '../globals/double';
 
 type Player = {
   id: string,
@@ -11,7 +12,8 @@ type Props = {
   bombHolder: Object,
   possibleHolders: Array<Player>,
   id: string,
-  onPassBomb: () => void
+  onPassBomb: () => void,
+  received: boolean
 }
 
 class Spectator extends Component {
@@ -35,7 +37,8 @@ class Spectator extends Component {
 
   render() {
 
-    const {time, bombHolder, possibleHolders, id} = this.props;
+    const {time, bombHolder, possibleHolders, id, received} = this.props;
+    const doubleTime = double(time);
 
     const selected = possibleHolders.find(p => {
       return p.id === id;
@@ -49,14 +52,34 @@ class Spectator extends Component {
       );
     }
 
-    if (!selected) {
+    else if (received) {
+
+      return (
+        <div>
+          <p>You have received the bomb from: </p>
+          <img src={bombHolder.picture} />
+
+          <div className='timeLockDisplay'>
+            <p className='timeLeft'>Time left:</p>
+            <p className='timer'>0:{doubleTime}</p>
+          </div>
+      </div>
+      );
+
+    }
+
+    else if (!selected) {
 
       return (
         <div>
           <p>Current holder of the bomb: </p>
           <img src={bombHolder.picture} />
-          <p>Time left: {time}</p>
-        </div>
+
+          <div className='timeLockDisplay'>
+            <p className='timeLeft'>Time left:</p>
+            <p className='timer'>0:{doubleTime}</p>
+          </div>
+      </div>
       );
 
     } else {
@@ -68,6 +91,11 @@ class Spectator extends Component {
           <ul className='players'>
             {this.renderFutureBombHolders()}
           </ul>
+
+          <div className='timeLockDisplay'>
+            <p className='timeLeft'>Time left:</p>
+            <p className='timer'>0:{doubleTime}</p>
+          </div>
         </div>
       );
 
