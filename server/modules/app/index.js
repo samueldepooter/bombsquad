@@ -28,10 +28,10 @@ module.exports.register = (server, options, next) => {
     players.push(player);
 
     //naar iedereen buiten jezelf sturen dat je gejoined bent
-    socket.broadcast.emit(`add`, player);
+    socket.broadcast.emit(`add`, playerId);
 
-    //naar jezelf alle players die geconnect zijn met de server sturen
-    socket.emit(`addAll`, players);
+    //naar jezelf de lengte van alle players die geconnect zijn met de server sturen
+    socket.emit(`addAll`, players.length);
 
     console.log(`Player with ID: ${player.id} is connected. ${players.length} spelers in totaal`);
 

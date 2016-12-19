@@ -1,23 +1,6 @@
-//@flow
-
-type BombHolder = {
-  id: string,
-  picture: string,
-  room: string
-}
-
-type Room = {
-  id: string
-}
-
 class Timer {
 
-  io: Object
-  bombHolder: BombHolder
-  room: Room
-  time: number
-
-  constructor(io: Object, bombHolder: BombHolder, room: Room, time: number) {
+  constructor(io, bombHolder, room, time) {
     this.io = io;
     this.bombHolder = bombHolder;
     this.room = room;
