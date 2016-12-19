@@ -2,13 +2,8 @@
 
 import React, {Component} from 'react';
 
-type Player = {
-  id: string,
-  picture: string
-}
-
 type Props = {
-  players: Array<Player>,
+  players: number,
   onCheckRoom: () => void,
   onAddRoom: () => void,
   loading: boolean,
@@ -20,17 +15,6 @@ class Menu extends Component {
   props: Props;
   code: Object;
 
-  renderPlayers() {
-
-    const {players} = this.props;
-
-    return players.map((player, i) => {
-      return (
-        <li className='player' key={i}>{player.id}</li>
-      );
-    });
-  }
-
   submitCode(e: Object) {
     e.preventDefault();
     const {onCheckRoom} = this.props;
@@ -39,14 +23,7 @@ class Menu extends Component {
 
   render() {
 
-    const {onAddRoom, loading, error} = this.props;
-    console.log(error);
-
-    const loader = document.querySelector(`.loader`);
-    if (loader) {
-      if (loading) loader.style.display = `flex`;
-      else loader.style.display = `none`;
-    }
+    const {onAddRoom, error, players} = this.props;
 
     return (
 
@@ -80,9 +57,12 @@ class Menu extends Component {
       /*
       <div>
 
+<<<<<<< HEAD
         <div className='loader'>One moment... fetching all those bombers</div>
 
 
+=======
+>>>>>>> 93dd1d9a34b8f5a0e9ba73f3e5616da3def77943
         <header>
           <h1 className='title'>Bomb Squad</h1>
         </header>
@@ -94,12 +74,7 @@ class Menu extends Component {
           <input ref={code => this.code = code} type='text' placeholder='code van de room' />
         </form>
 
-        <section>
-          <h2 className='subtitle'>Players op de server</h2>
-          <ul className='players'>
-            {this.renderPlayers()}
-          </ul>
-        </section>
+        <p>Players online: {players}</p>
 
 
         <p className='error'>{error}</p>

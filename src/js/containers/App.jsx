@@ -24,7 +24,7 @@ type Player = {
 }
 
 type state = {
-  players: Array<Player>,
+  players: number,
   playersInMyRoom: Array<Player>,
   room: string,
   bombHolder: Object,
@@ -38,7 +38,7 @@ type state = {
 class App extends Component {
 
   state: state = {
-    players: [],
+    players: 0,
     playersInMyRoom: [],
     room: ``,
     bombHolder: {},
@@ -133,7 +133,7 @@ class App extends Component {
 
   busyWSHandler(id: string) {
     let {error} = this.state;
-    error = `Room ${id} is al bezig met spelen`;
+    error = `Room ${id} is already playing`;
 
     this.setState({error});
   }
@@ -182,7 +182,7 @@ class App extends Component {
 
   notFoundWSHandler(id: string) {
     let {error} = this.state;
-    error = `Room ${id} werd niet gevonden!`;
+    error = `Room ${id} was not found`;
     this.setState({error});
   }
 
@@ -195,35 +195,36 @@ class App extends Component {
     this.setState({playersInMyRoom});
   }
 
-  addWSHandler(player: Player) {
-    const {players} = this.state;
-    players.push(player);
+  addWSHandler(playerId: number) {
+    let {players} = this.state;
+    players ++;
+
     this.setState({players});
+
+    console.log(`Player [${playerId}] joined`);
   }
 
   removeWSHandler(playerId: number) {
-    const {players, playersInMyRoom} = this.state;
+    const {playersInMyRoom} = this.state;
+    let {players} = this.state;
 
-    const updatedPlayers = players.filter(p => {
-      return p.id !== playerId;
-    });
+    players --;
 
     const updatedPlayersInMyRoom = playersInMyRoom.filter(p => {
       return p.id !== playerId;
     });
 
     this.setState({
-      players: updatedPlayers,
+      players,
       playersInMyRoom: updatedPlayersInMyRoom
     });
+
+    console.log(`Player [${playerId}] left`);
   }
 
-  addAllWSHandler(allPlayers: Array<Object>) {
-    const {players} = this.state;
-    allPlayers.forEach(player => {
-      players.push(player);
-    });
-    this.setState({players, loading: false});
+  addAllWSHandler(allPlayers: number) {
+    this.setState({players: allPlayers});
+    console.log(`Total players: ${allPlayers}`);
   }
 
   addRoomHandler() {

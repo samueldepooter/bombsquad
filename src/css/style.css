@@ -348,19 +348,6 @@ input[placeholder] {
   padding: 3rem 0;
 }
 
-.loader {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: red;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
 .error {
   color: red;
 }
