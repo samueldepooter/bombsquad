@@ -13,8 +13,12 @@ body {
 }
 
 .container {
-  width: 41.4rem;
-  height: 73.6rem;
+  /* width: 41.4rem; */
+
+  /* height: 73.6rem; */
+
+  width: 100vw;
+  height: 100vh;
   background: #f43d25;
   overflow: hidden;
 }
@@ -78,12 +82,13 @@ main {
 }
 
 .logo {
-  margin-top: 5rem;
+  margin-top: 2rem;
   background-size: contain;
   background-image: url(../assets/logo.svg);
   background-repeat: no-repeat;
   background-position: center center;
-  width: 35rem;
+  max-width: 35rem;
+  width: 80vw;
   height: 25rem;
   margin-left: -1.7rem;
 }
@@ -104,7 +109,7 @@ main {
 }
 
 .formwrapperMenu {
-  margin-top: 14rem;
+  margin-top: 0;
   z-index: 999;
   width: 30rem;
   display: flex;
@@ -132,6 +137,7 @@ input[placeholder] {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
 }
 
 .menu .menuform {
@@ -182,8 +188,14 @@ input[placeholder] {
 
 .picture {
   font-size: 2rem;
-  width: 41.4rem;
-  height: 73.6rem;
+
+  /* width: 41.4rem; */
+
+  /* height: 73.6rem; */
+
+  width: 100vw;
+  height: 100vh;
+
   overflow-y: hidden;
 }
 
@@ -293,10 +305,13 @@ input[placeholder] {
 }
 
 .codelist li {
-  display: inline-block;
+  display: flex;
+  justify-content: center;
   font-size: 4rem;
+  font-weight: bold;
   border-bottom: .5rem solid white;
-  margin: 0 2rem;
+  margin: 0 1rem;
+  padding: 0 2rem;
   width: 2rem;
   line-height: 5rem;
 }
@@ -369,7 +384,7 @@ input[placeholder] {
   transform: scale(-1, 1);
   background-position: center center;
   margin: 1rem;
-  border: .8rem solid #ffb510;
+  border: .5rem solid #ffb510;
   box-shadow: 0 6px 0 rgba(0, 0, 0, .1);
 }
 
@@ -624,4 +639,11 @@ input[placeholder] {
   background-color: #f43d25;
   width: 40%;
   display: inline-block;
+}
+
+@media only screen and (max-device-width: 320px) {
+
+  .bombmenu {
+    background-position: -15rem 16rem;
+  }
 }
