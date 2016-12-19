@@ -70,28 +70,78 @@ class Room extends Component {
   render() {
 
     const {room} = this.props;
+    const roomIdString = room.toString();
 
     return (
-      <div>
-        <header>
-          <h1 className='title'>Code: {room}</h1>
+
+      <section className='room phonewrapper'>
+
+        <header className='globalheader'>
+          <div className='screw screwleft'></div>
+          <h2>Share this code to  <br /> let your friends join!</h2>
+          <div className='screw screwright'></div>
         </header>
 
-        <section>
-          <h2 className='subtitle'>Host</h2>
-          {this.renderHostName()}
+        <div className='codewrapper'>
+          <section className='code'>
+            <ul className='codelist'>
+              <li className='codenumber'>{roomIdString.charAt(0)}</li>
+              <li className='codenumber'>{roomIdString.charAt(1)}</li>
+              <li className='codenumber'>{roomIdString.charAt(2)}</li>
+              <li className='codenumber'>{roomIdString.charAt(3)}</li>
+            </ul>
+            <button className='copyCodeButton' onClick={() => this.copyCode()}></button>
+          </section>
+        </div>
+        <div className='coolBorder'></div>
+
+        <section className='playersWrapper'>
+          <h2 className='subtitle'>Players:</h2>
+            <ul className='players'>
+              {this.renderPlayers()}
+              {this.renderPlayers()}
+              {this.renderPlayers()}
+              {this.renderPlayers()}
+              {this.renderPlayers()}
+              {this.renderPlayers()}
+              {this.renderPlayers()}
+              {this.renderPlayers()}
+              {this.renderPlayers()}
+              {this.renderPlayers()}
+              {this.renderPlayers()}
+              {this.renderPlayers()}
+              {this.renderPlayers()}
+              {this.renderPlayers()}
+              {this.renderPlayers()}
+            </ul>
         </section>
 
-        <section>
-          <h2 className='subtitle'>Players</h2>
-          <ul>
-            {this.renderPlayers()}
-          </ul>
-        </section>
+        <div className='startbutton'>
+          {this.renderStartButton()}
+        </div>
 
-        {this.renderStartButton()}
+      </section>
 
-      </div>
+      // {<div>
+      //   <header>
+      //     <h1 className='title'>Code: {room}</h1>
+      //   </header>
+      //
+      //   <section>
+      //     <h2 className='subtitle'>Host</h2>
+      //     {this.renderHostName()}
+      //   </section>
+      //
+      //   <section>
+      //     <h2 className='subtitle'>Players</h2>
+      //     <ul>
+      //       {this.renderPlayers()}
+      //     </ul>
+      //   </section>
+      //
+      //   {this.renderStartButton()}
+      //
+      // </div>}
     );
   }
 

@@ -1,61 +1,351 @@
 @import 'reset';
 
 body {
-  font-family: 'Helvetica neue', Helvetica, Arial, sans-serif;
-  margin: 2rem;
-}
-
-.player {
-  color: #09c;
-}
-
-.title {
-  font-size: 2rem;
-  text-align: center;
-  margin-bottom: 5rem;
-}
-
-.subtitle {
-  font-size: 1.6rem;
-  margin-bottom: .5rem;
-}
-
-.btn {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-decoration: none;
-  width: 100%;
-  height: 5rem;
-  margin: 1rem 0;
+  font-family: Montserrat, sans-serif;
+  font-size: 2.5rem;
+  background-color: blue;
   color: white;
-  background-color: #09c;
-}
-
-input[type='text'] {
-  border: 1px solid grey;
-  width: 100%;
-  height: 5rem;
-  margin: 1rem 0;
-  padding: 1rem;
-}
-
-section {
-  margin-bottom: 3rem;
-}
-
-.playerPictureWrap {
+  width: 100vw;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 5rem;
-  width: 5rem;
-  border-radius: 100%;
+}
+
+.container {
+  width: 41.4rem;
+  height: 73.6rem;
+  background: #f43d25;
   overflow: hidden;
 }
 
+main {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.hidden {
+  display: none;
+}
+
+.logoheader {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.screw {
+  width: 3rem;
+  height: 4rem;
+  background-repeat: no-repeat;
+  background-image: url(../assets/screw.svg);
+  position: absolute;
+  z-index: 9999;
+}
+
+.topleft {
+  top: 1rem;
+  left: 1rem;
+}
+
+.topright {
+  top: 1rem;
+  right: 1rem;
+}
+
+.bottomleft {
+  bottom: .3rem;
+  left: 1rem;
+}
+
+.bottomright {
+  bottom: .3rem;
+  right: 1rem;
+}
+
+.bombmenu {
+  position: absolute;
+  bottom: 0;
+  background-image: url(../assets/bombhome.svg);
+  width: 100%;
+  height: 100%;
+  background-size: 55rem;
+  background-position: -7rem 20rem;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+.logo {
+  margin-top: 5rem;
+  background-size: contain;
+  background-image: url(../assets/logo.svg);
+  background-repeat: no-repeat;
+  background-position: center center;
+  width: 35rem;
+  height: 25rem;
+  margin-left: -1.7rem;
+}
+
+.button {
+  background-color: #ffb510;
+  padding: 2rem 4rem;
+  color: white;
+  font-weight: bolder;
+  text-decoration: none;
+  border-radius: 10rem;
+  border: none;
+  display: inline-block;
+  font-family: Montserrat, sans-serif;
+  box-shadow: 0 10px 0 rgba(0, 0, 0, .25);
+}
+
+.formwrapperMenu {
+  margin-top: 15rem;
+  z-index: 999;
+  width: 30rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.or {
+  margin: 2rem auto;
+  color: #4e4c51;
+}
+
+.phonewrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.menu .menuform {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.menuform label {
+  margin-bottom: 1.5rem;
+}
+
+input[placeholder] {
+  color: white;
+}
+
+.codeinputwrapper {
+  display: flex;
+  align-items: center;
+}
+
+.codeinput {
+  text-align: center;
+  outline: none;
+  border: none;
+  font-size: 2.5rem;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  display: inline-block;
+  border-radius: 5rem;
+  width: 20rem;
+  color: white;
+  background-color: #0f0f0f;
+  background-size: 3rem;
+  background-position: 2.2rem 1.4rem;
+  letter-spacing: 10px;
+  text-transform: uppercase;
+  font-weight: bolder;
+  box-shadow: 0 10px 0 rgba(0, 0, 0, .25);
+}
+
+.lockicon {
+  display: inline-block;
+  width: 4rem;
+  height: 4rem;
+  margin-right: 1.5rem;
+  background-image: url(../assets/lock-icon.svg);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center center;
+}
+
+.picture {
+  font-size: 2rem;
+}
+
+.globalheader {
+  background-color: #28262b;
+  height: 10rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  box-shadow: 0 10px 0 rgba(0, 0, 0, .1);
+}
+
+.globalheader h2 {
+  width: 60%;
+  text-align: center;
+  line-height: 2.5rem;
+  font-size: 2rem;
+}
+
+.picture .globalheader {
+  border-bottom: 10px solid #191819;
+}
+
+.picture .screw {
+  margin-top: 0;
+}
+
+.screwleft {
+  left: 2rem;
+}
+
+.screwright {
+  right: 2rem;
+}
+
+.video {
+  z-index: 0;
+  margin-left: -24rem;
+  width: 116vh;
+  transform: scale(-1, 1);
+}
+
+.picturebuttonwrapper {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  bottom: 3rem;
+  z-index: 999;
+  width: 100%;
+}
+
+.picturebutton {
+  display: inline-block;
+  background-color: white;
+  border-radius: 10rem;
+  width: 10rem;
+  height: 10rem;
+  border: 10px solid #ffb510;
+  background-image: url(../assets/camera-icon.svg);
+  background-position: center center;
+  background-size: 55%;
+  background-repeat: no-repeat;
+}
+
+.room {
+  background-color: white;
+}
+
+.room .button {
+  font-size: 2rem;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, .1);
+}
+
+.code, .codelist {
+  display: flex;
+  align-items: center;
+}
+
+.codelist li {
+  display: inline-block;
+  font-size: 4rem;
+  border-bottom: .5rem solid white;
+  margin: 0 2rem;
+  width: 2rem;
+  line-height: 5rem;
+}
+
+.codewrapper {
+  background-color: #f43d25;
+  padding-top: 2rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 3rem;
+}
+
+.coolBorder {
+  height: 2rem;
+  width: 100%;
+  background-image: url(../assets/red_border.svg);
+  background-repeat: repeat-x;
+  background-position: bottom left;
+}
+
+.copyCodeButton {
+  width: 7rem;
+  height: 7rem;
+  display: inline-block;
+  background-color: #ffb510;
+  border-radius: 7rem;
+  border: none;
+  margin-left: 2rem;
+  background-image: url(../assets/link-icon.svg);
+  background-size: 50%;
+  background-position: center center;
+  background-repeat: no-repeat;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, .1);
+  outline: none;
+}
+
+.subtitle {
+  color: #232123;
+  font-weight: bolder;
+  margin: 3rem 0;
+  text-align: center;
+}
+
+.players {
+  width: 90%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.playersWrapper {
+  width: 100%;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
 .playerPicture {
-  max-height: 5rem;
+  width: 10rem;
+  height: 10rem;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10rem;
+  background-size: cover;
+  transform: scale(-1, 1);
+  background-position: center center;
+  margin: 1rem;
+  border: .8rem solid #ffb510;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, .1);
+}
+
+.startbutton {
+  display: flex;
+  width: 100%;
+  background-color: white;
+  justify-content: center;
+  bottom: 2rem;
+  padding: 3rem 0;
 }
 
 .loader {
