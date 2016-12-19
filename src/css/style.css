@@ -413,6 +413,12 @@ input[placeholder] {
   animation-timing-function: ease;
 }
 
+.playerPicture .dotAnimationWrapper {
+  color: #0f0f0f;
+  right: 5.5rem;
+  top: 3rem;
+}
+
 .dot2 {
   margin-left: 1rem;
   animation-delay: .1s;

@@ -25,9 +25,21 @@ class Room extends Component {
     const {playersInMyRoom} = this.props;
 
     return playersInMyRoom.map((player, i) => {
-      return (
-        <li className='playerPicture' style={{backgroundImage: `url(${player.picture})`}} key={i}></li>
-      );
+      if (player.picture) {
+        return (
+          <li className='playerPicture' style={{backgroundImage: `url(${player.picture})`}} key={i}></li>
+        );
+      } else {
+        return (
+            <li className='playerPicture' key={i}>
+              <div className='dotAnimationWrapper'>
+                <span className='dot1'>.</span>
+                <span className='dot2'>.</span>
+                <span className='dot3'>.</span>
+              </div>
+            </li>
+        );
+      }
     });
   }
 
