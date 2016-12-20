@@ -5,7 +5,7 @@ import {Match, Redirect} from 'react-router';
 import Router from 'react-router/BrowserRouter';
 import IO from 'socket.io-client';
 
-const timerTime = 10000;
+const timerTime = 1000;
 
 import {
   Menu,
@@ -36,7 +36,6 @@ type state = {
   dead: boolean,
   error: string,
   winner: boolean,
-  winningPlayer: Object,
   received: boolean,
   given: boolean
 }
@@ -54,7 +53,6 @@ class App extends Component {
     bombHolder: {},
     newBombHolder: {},
     time: timerTime,
-    winningPlayer: {},
     dead: false,
     error: ``,
     winner: false,
@@ -90,6 +88,7 @@ class App extends Component {
     this.socket.on(`startGame`, data => this.startGameWSHandler(data));
     this.socket.on(`randomBombHolder`, data => this.setBombHolderWSHandler(data));
     this.socket.on(`newBombHolder`, data => this.setBombHolderWSHandler(data));
+    this.socket.on(`time`, data => this.timeWSHandler(data));
     this.socket.on(`winner`, player => this.winnerWSHandler(player));
     this.socket.on(`passBomb`, possibleHolders => this.passBombWSHandler(possibleHolders));
     this.socket.on(`received`, time => this.receivedWSHandler(time));
@@ -120,7 +119,7 @@ class App extends Component {
     this.setState({possibleHolders});
   }
 
-  winnerWSHandler(player: Player) {
+  winnerWSHandler(player) {
     let {winner} = this.state;
     winner = true;
     this.setState({
@@ -128,6 +127,48 @@ class App extends Component {
       winningPlayer: player
     });
     router.transitionTo(`/winner`);
+  }
+
+  timeWSHandler(data: {time: number, bombHolder: Object}) {
+
+    let {time} = this.state;
+    const {room} = this.state;
+
+    //checken of jij de bom hebt
+    if (data.bombHolder.id === this.socket.id) {
+
+      //jij hebt de bom
+      console.log(data.time, `You are holding the bomb`);
+
+      //als je tijd op is ben je zelf dood
+      if (data.time <= 0) {
+
+        let {dead} = this.state;
+        dead = true;
+        this.setState({dead});
+
+        //jezelf uit de room verwijderen
+        this.socket.emit(`leave`);
+        this.socket.emit(`randomBombHolder`, room);
+
+        console.log(`YOU are dead`);
+        router.transitionTo(`/dead`);
+      }
+
+    } else {
+
+      //jij hebt niet de bom
+      console.log(data.time, `Currently holding the bomb: ${data.bombHolder.id}`);
+
+      //als de tijd op is, is deze speler dood
+      if (data.time <= 0) {
+        console.log(`Player ${data.bombHolder.id} is dead`);
+      }
+
+    }
+
+    time = data.time;
+    this.setState({time});
   }
 
   busyWSHandler(id: string) {
@@ -152,7 +193,7 @@ class App extends Component {
   startTimer(bombHolder: Player) {
 
     let {time, dead} = this.state;
-    const {room, playersInMyRoom} = this.state;
+    const {room} = this.state;
 
     this.clearTimer();
 
@@ -168,7 +209,7 @@ class App extends Component {
           this.setState({dead});
 
           //jezelf uit de room verwijderen
-          this.socket.emit(`leave`, this.socket.id);
+          this.socket.emit(`leave`);
           //nieuwe random bombholder zoeken
           this.socket.emit(`randomBombHolder`, room);
 
@@ -176,7 +217,6 @@ class App extends Component {
         }
 
       } else {
-        if (playersInMyRoom === 2) this.setState({winner: true});
         //jij hebt niet de bom
         console.log(time, `Currently holding the bomb: ${bombHolder.id}`);
       }

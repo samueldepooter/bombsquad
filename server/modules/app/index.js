@@ -144,7 +144,7 @@ module.exports.register = (server, options, next) => {
       if (playersInMyRoom.length === 1) {
 
         console.log(`${playersInMyRoom[0].id} wins!`);
-        io.in(room.id).emit(`clearTimer`);
+        //io.in(room.id).emit(`clearTimer`);
         io.in(room.id).emit(`winner`);
         room.id = ``;
         return;
@@ -160,7 +160,7 @@ module.exports.register = (server, options, next) => {
       setTimeout(() => {
         //tijd opnieuw starten met nieuwe bombHolder na x seconden
         io.in(room.id).emit(`newBombHolder`, bombHolder);
-      }, 1500);
+      }, 2000);
 
     });
 
@@ -181,7 +181,7 @@ module.exports.register = (server, options, next) => {
       //als playersInMyRoom nog maar 1 speler bevat dan heeft die gewonnen
       if (playersInMyRoom.length === 1) {
         console.log(`${playersInMyRoom[0].id} wins!`);
-        io.in(myRoom).emit(`winner`, playersInMyRoom[0]);
+        io.in(myRoom).emit(`winner`);
         room.id = ``;
         return;
       }
@@ -192,7 +192,7 @@ module.exports.register = (server, options, next) => {
       //timeout van 3s vooraleer het terug begint
       setTimeout(() => {
         io.in(myRoom).emit(`randomBombHolder`, bombHolder);
-      }, 1500);
+      }, 2000);
 
     });
 

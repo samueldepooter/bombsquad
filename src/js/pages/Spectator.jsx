@@ -48,11 +48,24 @@ class Spectator extends Component {
       return p.id === id;
     });
 
+    console.log(time);
+
     if (time <= 0) {
       return (
-        <div>
-          <p>{bombHolder.id} died! Prepare, looking for a new holder...</p>
-        </div>
+        <section className='winner phonewrapper'>
+          <header className='globalheader'>
+            <div className='screw screwleft'></div>
+            <div className='titleWinnerWrapper'>
+              <div className='winnerBombImage'></div>
+              <h2>RIP</h2>
+            </div>
+            <div className='screw screwright'></div>
+          </header>
+          <div className='winnerPicture'>
+            <div className='playerPicture' style={{backgroundImage: `url(${bombHolder.picture})`}}></div>
+            <p>The player didn't make it. Let's look for a new victim!</p>
+          </div>
+        </section>
       );
     }
 
@@ -67,36 +80,10 @@ class Spectator extends Component {
 
     }
 
-    else if (!selected) {
+    else if (selected) {
 
       return (
-      <section className='spectator phonewrapper'>
-        <header className='globalheader'>
-          <div className='screw screwleft'></div>
-            <h2>Current holder of the bomb:</h2>
-          <div className='screw screwright'></div>
-        </header>
-        <div>
-          <p></p>
-          <div className='playerPicture' style={{backgroundImage: `url(${bombHolder.picture})`}}></div>
-          <div className='timeLockDisplay'>
-            <p className='timeLeft'>Time left:</p>
-            <p className='timer'>0:{doubleTime}</p>
-          </div>
-        </div>
-        <div className='powerupsWrapper'>
-          <p>Powerups:</p>
-          <ul className='powerupsList'>
-            <li className='shield powerup shieldactive' onClick={() => this.activateShield()}></li>
-            <li className='sound powerup' onClick={() => this.activateSound()}></li>
-          </ul>
-        </div>
-      </section>
-      );
 
-    } else {
-
-      return (
         <div>
           <p>Prepare yourself, you might receive the bomb!</p>
           <p>The bomb holder can pick from these players</p>
@@ -109,6 +96,33 @@ class Spectator extends Component {
             <p className='timer'>0:{doubleTime}</p>
           </div>
         </div>
+      );
+
+    } else {
+
+      return (
+      <section className='spectator phonewrapper'>
+        <header className='globalheader'>
+          <div className='screw screwleft'></div>
+            <h2>Current holder of the bomb:</h2>
+          <div className='screw screwright'></div>
+        </header>
+
+        <div className='playerPicture' style={{backgroundImage: `url(${bombHolder.picture})`}}></div>
+
+        <div className='timeLockDisplay'>
+          <p className='timeLeft'>Time left:</p>
+          <p className='timer'>0:{doubleTime}</p>
+        </div>
+
+        <div className='powerupsWrapper'>
+          <p>Powerups:</p>
+          <ul className='powerupsList'>
+            <li className='shield powerup shieldactive' onClick={() => this.activateShield()}></li>
+            <li className='sound powerup' onClick={() => this.activateSound()}></li>
+          </ul>
+        </div>
+      </section>
       );
 
     }
