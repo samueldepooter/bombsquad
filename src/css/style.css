@@ -706,6 +706,7 @@ input[placeholder] {
   margin-top: 3rem;
   text-align: center;
   width: 80%;
+  font-size: 2.5rem;
 }
 
 .winner .playerPicture {
@@ -714,6 +715,7 @@ input[placeholder] {
   border-radius: 25rem;
   border: 1rem solid #ffb510;
   box-shadow: 0 1.5rem 0 rgba(0, 0, 0, .07);
+  transform: scale(-1, 1);
 }
 
 @import 'responsive';
