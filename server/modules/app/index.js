@@ -181,7 +181,7 @@ module.exports.register = (server, options, next) => {
       //als playersInMyRoom nog maar 1 speler bevat dan heeft die gewonnen
       if (playersInMyRoom.length === 1) {
         console.log(`${playersInMyRoom[0].id} wins!`);
-        io.in(myRoom).emit(`winner`);
+        io.in(myRoom).emit(`winner`, playersInMyRoom[0]);
         room.id = ``;
         return;
       }

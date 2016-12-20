@@ -5,7 +5,7 @@ import {Match, Redirect} from 'react-router';
 import Router from 'react-router/BrowserRouter';
 import IO from 'socket.io-client';
 
-const timerTime = 10;
+const timerTime = 1;
 
 import {
   Menu,
@@ -89,7 +89,7 @@ class App extends Component {
     this.socket.on(`randomBombHolder`, data => this.setBombHolderWSHandler(data));
     this.socket.on(`newBombHolder`, data => this.setBombHolderWSHandler(data));
     this.socket.on(`time`, data => this.timeWSHandler(data));
-    this.socket.on(`winner`, () => this.winnerWSHandler());
+    this.socket.on(`winner`, player => this.winnerWSHandler(player));
     this.socket.on(`passBomb`, possibleHolders => this.passBombWSHandler(possibleHolders));
     this.socket.on(`received`, time => this.receivedWSHandler(time));
     this.socket.on(`given`, to => this.givenWSHandler(to));
@@ -119,10 +119,13 @@ class App extends Component {
     this.setState({possibleHolders});
   }
 
-  winnerWSHandler() {
+  winnerWSHandler(player) {
     let {winner} = this.state;
     winner = true;
-    this.setState({winner});
+    this.setState({
+      winner,
+      winningPlayer: player
+    });
     router.transitionTo(`/winner`);
   }
 
@@ -503,11 +506,13 @@ class App extends Component {
 
                 //check doen nog op players in my room
 
-                const {winner, playersInMyRoom} = this.state;
+                const {winner, winningPlayer} = this.state;
+
+                console.log(winningPlayer);
 
                 if (winner) {
                   return (<Winner
-                  winner={playersInMyRoom[0]}
+                    winningPlayer={winningPlayer}
                   />);
                 } else {
                   return (
