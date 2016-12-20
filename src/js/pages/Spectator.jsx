@@ -26,13 +26,17 @@ class Spectator extends Component {
 
     return possibleHolders.map((player, i) => {
       return (
-        <li className='player' key={i}>
-          <div className='playerPictureWrap'>
-            <img src={player.picture} className='playerPicture' onClick={() => onPassBomb(player)} />
-          </div>
-        </li>
+        <li className='playerPicture' style={{backgroundImage: `url(${player.picture})`}} onClick={() => onPassBomb(player)} key={i}></li>
       );
     });
+  }
+
+  activateShield() {
+    console.log(`shield`);
+  }
+
+  activateSound() {
+    console.log(`sound`);
   }
 
   render() {
@@ -66,15 +70,28 @@ class Spectator extends Component {
     else if (!selected) {
 
       return (
+      <section className='spectator phonewrapper'>
+        <header className='globalheader'>
+          <div className='screw screwleft'></div>
+            <h2>Current holder of the bomb:</h2>
+          <div className='screw screwright'></div>
+        </header>
         <div>
-          <p>Current holder of the bomb: </p>
-          <img src={bombHolder.picture} />
-
+          <p></p>
+          <div className='playerPicture' style={{backgroundImage: `url(${bombHolder.picture})`}}></div>
           <div className='timeLockDisplay'>
             <p className='timeLeft'>Time left:</p>
             <p className='timer'>0:{doubleTime}</p>
           </div>
-      </div>
+        </div>
+        <div className='powerupsWrapper'>
+          <p>Powerups:</p>
+          <ul className='powerupsList'>
+            <li className='shield powerup shieldactive' onClick={() => this.activateShield()}></li>
+            <li className='sound powerup' onClick={() => this.activateSound()}></li>
+          </ul>
+        </div>
+      </section>
       );
 
     } else {

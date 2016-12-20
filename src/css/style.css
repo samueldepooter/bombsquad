@@ -13,9 +13,8 @@ body {
 }
 
 .container {
-  /* width: 41.4rem; */
-
-  /* height: 73.6rem; */
+  /*width: 41.4rem;
+  height: 73.6rem;*/
 
   width: 100vw;
   height: 100vh;
@@ -71,7 +70,6 @@ main {
 
 .bombmenu {
   position: absolute;
-  bottom: 0;
   background-image: url(../assets/bombhome.svg);
   width: 100%;
   height: 100%;
@@ -109,7 +107,9 @@ main {
 }
 
 .formwrapperMenu {
-  margin-top: 0;
+  position:absolute;
+  bottom: 4rem;
+  margin-top: -10rem;
   z-index: 999;
   width: 30rem;
   display: flex;
@@ -164,8 +164,9 @@ input[placeholder] {
   padding-bottom: 2rem;
   display: inline-block;
   border-radius: 5rem;
-  width: 20rem;
+  width: 18rem;
   color: white;
+  padding-left: 5%;
   background-color: #0f0f0f;
   background-size: 3rem;
   background-position: 2.2rem 1.4rem;
@@ -173,6 +174,7 @@ input[placeholder] {
   text-transform: uppercase;
   font-weight: bolder;
   box-shadow: 0 10px 0 rgba(0, 0, 0, .25);
+  appearance: none;
 }
 
 .lockicon {
@@ -381,10 +383,10 @@ input[placeholder] {
   align-items: center;
   border-radius: 10rem;
   background-size: cover;
-  transform: scale(-1, 1);
   background-position: center center;
   margin: 1rem;
   border: .5rem solid #ffb510;
+  transform: scale(-1, 1);
   box-shadow: 0 6px 0 rgba(0, 0, 0, .1);
 }
 
@@ -641,7 +643,7 @@ input[placeholder] {
   display: inline-block;
 }
 
-.dead {
+.dead, .spectator {
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -709,13 +711,92 @@ input[placeholder] {
   font-size: 2.5rem;
 }
 
-.winner .playerPicture {
+.winner .playerPicture, .spectator .playerPicture {
   width: 30rem;
   height: 30rem;
   border-radius: 25rem;
   border: 1rem solid #ffb510;
   box-shadow: 0 1.5rem 0 rgba(0, 0, 0, .07);
-  transform: scale(-1, 1);
+}
+
+.spectator .globalheader h2 {
+  width: 40%;
+}
+
+.spectator .playerPicture {
+  margin: 4rem 0;
+}
+
+.spectator .timer {
+  color: white;
+}
+
+.powerupsWrapper {
+  position: absolute;
+  bottom: 0;
+  background-color: #d62e29;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 0;
+}
+
+.powerupsList {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 2rem;
+}
+
+.powerupsList .shieldactive, .powerupsList .soundactive {
+  background-color: #ffb510;
+  box-shadow: 0 10px 0 rgba(0, 0, 0, .1);
+}
+
+.powerup {
+  margin-left: 1.5rem;
+  width: 8rem;
+  height: 8rem;
+  background-color: #c5282a;
+  border-radius: 10rem;
+  background-size: 3rem;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.inputbutton {
+  color: #ffb510;
+  width: 6.5rem;
+  height: 6.5rem;
+  border-radius: 6.5rem;
+  display: inline-block;
+  background-image: url(../assets/arrow.svg);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 3.5rem;
+  outline: none;
+  border: none;
+  z-index: 100;
+  margin-left: 2rem;
+  background-color: #ffb510;
+  box-shadow: 0 10px 0 rgba(0, 0, 0, .25);
+}
+
+.shield {
+  background-image: url(../assets/shield-icon-n.svg);
+}
+
+.shieldactive {
+  background-image: url(../assets/shield-icon.svg);
+}
+
+.sound {
+  background-image: url(../assets/sound-icon-n.svg);
+}
+
+.soundactive {
+  background-image: url(../assets/sound-icon.svg);
 }
 
 @import 'responsive';

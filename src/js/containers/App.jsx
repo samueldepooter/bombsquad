@@ -5,7 +5,7 @@ import {Match, Redirect} from 'react-router';
 import Router from 'react-router/BrowserRouter';
 import IO from 'socket.io-client';
 
-const timerTime = 1;
+const timerTime = 10000;
 
 import {
   Menu,

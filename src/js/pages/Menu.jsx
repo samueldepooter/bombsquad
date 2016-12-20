@@ -38,6 +38,8 @@ class Menu extends Component {
     e.preventDefault();
     const {onCheckRoom} = this.props;
     onCheckRoom(this.code.value);
+    this.setState({checkCode: ``});
+
   }
 
   limitInput() {
@@ -45,6 +47,10 @@ class Menu extends Component {
       this.code.value = this.code.value.slice(0, 4);
     }
     this.setState({checkCode: this.code.value});
+  }
+
+  handleSubmit() {
+    console.log(`hey`);
   }
 
   render() {
@@ -60,7 +66,7 @@ class Menu extends Component {
 
       <section className='formwrapperMenu'>
         <div>
-          <button to={`/rooms/create`} className='button' onClick={() => onAddRoom()}> Create a room</button>
+          <button to={`/rooms/create`} className='button' onClick={() => onAddRoom()}>Create a room</button>
         </div>
 
         <p className='or'>or</p>
@@ -70,7 +76,8 @@ class Menu extends Component {
 
           <div className='codeinputwrapper'>
             <label htmlFor='code' className='lockicon'></label>
-            <input ref={code => this.code = code} onChange={() => this.limitInput()} value={checkCode}className='codeinput' id='code' min='1000' max='9999' size='4' type='number' placeholder='XXXX' />
+            <input ref={code => this.code = code} onChange={() => this.limitInput()} value={checkCode} className='codeinput' id='code' min='1000' max='9999' size='4' type='number' placeholder='XXXX' />
+            <button className='inputbutton' onClick={() => this.handleSubmit()}></button>
           </div>
 
           <p className='error'>{error}</p>
