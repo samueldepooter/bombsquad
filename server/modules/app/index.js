@@ -236,7 +236,13 @@ module.exports.register = (server, options, next) => {
       socket.broadcast.in(id).emit(`joined`, player);
     });
 
-    socket.on(`leave`, () => {
+    socket.on(`leave`, id => {
+
+      const leftPlayer = players.find(p => {
+        return p.id === id;
+      });
+
+      io.in(room.id).emit(`remove`, leftPlayer.id);
       socket.leave(room.id);
     });
 
