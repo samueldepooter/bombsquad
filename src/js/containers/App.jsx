@@ -40,6 +40,9 @@ type state = {
 
 class App extends Component {
 
+
+  //dead op false zetten!!
+
   state: state = {
     players: 0,
     playersInMyRoom: [],
@@ -440,10 +443,14 @@ class App extends Component {
               exactly pattern='/winner'
               render={() => {
 
-                const {winner} = this.state;
+                //check doen nog op players in my room
+
+                const {winner, playersInMyRoom} = this.state;
 
                 if (winner) {
-                  return (<Winner />);
+                  return (<Winner
+                  winner={playersInMyRoom[0]}
+                  />);
                 } else {
                   return (
                     <Redirect to={{

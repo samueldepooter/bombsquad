@@ -89,7 +89,7 @@ class Room extends Component {
 
         <header className='globalheader'>
           <div className='screw screwleft'></div>
-          <h2>Share this code to  <br /> let your friends join!</h2>
+          <h2>Share this code to let your friends join!</h2>
           <div className='screw screwright'></div>
         </header>
 

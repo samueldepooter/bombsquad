@@ -4,10 +4,17 @@ import React from 'react';
 
 const Dead = () => {
   return (
-    <section>
-      <p>Oh no, the bomb exploded! You're out!</p>
-      {/* a tag om alle variabelen te refreshen, kan ook link zijn maar moet dan handmatig alle variabelen van deze player updaten */}
-      <a href='/'>Menu</a>
+    <section className='dead phonewrapper'>
+      <header className='globalheader'>
+        <div className='screw screwleft'></div>
+        <h2>Oh no, the bomb exploded! You're out!</h2>
+        <div className='screw screwright'></div>
+      </header>
+      <img className='bangImage' src='assets/bang.svg'></img>
+      <div className='menuButtonWrapper'>
+        <div className='coolBorder'></div>
+        <a className='button' href='/'>Menu</a>
+      </div>
     </section>
   );
 };

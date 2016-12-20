@@ -25,7 +25,7 @@ module.exports.register = (server, options, next) => {
     };
 
     //timer aanmaken zodat je het overal kan aanspreken
-    const time = 10;
+    const time = 1;
     const timer = new Timer(io, {}, room, time);
 
     players.push(player);
@@ -154,6 +154,7 @@ module.exports.register = (server, options, next) => {
 
       //als playersInMyRoom nog maar 1 speler bevat dan heeft die gewonnen
       if (playersInMyRoom.length === 1) {
+
         console.log(`${playersInMyRoom[0].id} wins!`);
         io.in(room.id).emit(`winner`);
         room.id = ``;

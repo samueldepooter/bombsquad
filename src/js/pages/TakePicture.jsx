@@ -187,7 +187,7 @@ class TakePicture extends Component {
       <section className='picture phonewrapper'>
         <header className='globalheader'>
           <div className='screw screwleft'></div>
-          <h2>Take a selfie! <br /> This will be your avatar.</h2>
+          <h2>Take a selfie! This will be your avatar.</h2>
           <div className='screw screwright'></div>
         </header>
         <div className='camera'>

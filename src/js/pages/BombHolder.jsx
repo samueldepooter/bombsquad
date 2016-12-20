@@ -73,7 +73,7 @@ class BombHolder extends Component {
         <section className='lock'>
           <header className='turnPhone'>
               <div className='phoneIcon'></div>
-              <h2>Turn your phone <br /> to unlock the door</h2>
+              <h2>Turn your phone to unlock the door</h2>
           </header>
 
           <div className='wheelwrapper'>

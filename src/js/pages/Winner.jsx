@@ -3,11 +3,29 @@
 import React from 'react';
 
 const Winner = () => {
+
+  const player = ``;
+
   return (
-    <div>
-      <p>Congratulations, you're the bomb!</p>
-      <a href='/'>Menu</a>
-    </div>
+    <section className='winner phonewrapper'>
+      <header className='globalheader'>
+        <div className='screw screwleft'></div>
+        <div className='titleWinnerWrapper'>
+          <div className='winnerBombImage'></div>
+          <h2>Congratulations, you're da bomb!</h2>
+        </div>
+        <div className='screw screwright'></div>
+      </header>
+      <div className='winnerPicture'>
+        <div className='playerPicture' style={{backgroundImage: `url(${player.picture})`}}></div>
+        <p>You have won the game, hopefully you placed a bet with your friends!</p>
+      </div>
+
+      <div className='menuButtonWrapper'>
+        <div className='coolBorder'></div>
+        <a className='button' href='/'>Play again</a>
+      </div>
+    </section>
   );
 };
 
