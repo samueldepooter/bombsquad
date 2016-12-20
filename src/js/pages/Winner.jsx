@@ -2,13 +2,7 @@
 
 import React from 'react';
 
-type Player = {
-  id: string,
-  picture: string,
-  room: string
-}
-
-const Winner = (data: {winningPlayer: Player}) => {
+const Winner = (data: {picture: string}) => {
 
   return (
     <section className='winner phonewrapper'>
@@ -21,7 +15,7 @@ const Winner = (data: {winningPlayer: Player}) => {
         <div className='screw screwright'></div>
       </header>
       <div className='winnerPicture'>
-        <div className='playerPicture' style={{backgroundImage: `url(${data.winningPlayer.picture})`}}></div>
+        <div className='playerPicture' style={{backgroundImage: `url(${data.picture})`}}></div>
         <p>You have won the game, hopefully you placed a bet with your friends!</p>
       </div>
 

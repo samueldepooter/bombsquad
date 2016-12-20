@@ -44,11 +44,24 @@ class Spectator extends Component {
       return p.id === id;
     });
 
+    console.log(time);
+
     if (time <= 0) {
       return (
-        <div>
-          <p>{bombHolder.id} died! Prepare, looking for a new holder...</p>
-        </div>
+        <section className='winner phonewrapper'>
+          <header className='globalheader'>
+            <div className='screw screwleft'></div>
+            <div className='titleWinnerWrapper'>
+              <div className='winnerBombImage'></div>
+              <h2>RIP</h2>
+            </div>
+            <div className='screw screwright'></div>
+          </header>
+          <div className='winnerPicture'>
+            <div className='playerPicture' style={{backgroundImage: `url(${bombHolder.picture})`}}></div>
+            <p>The player didn't make it. Let's look for a new victim!</p>
+          </div>
+        </section>
       );
     }
 
@@ -63,21 +76,7 @@ class Spectator extends Component {
 
     }
 
-    else if (!selected) {
-
-      return (
-        <div>
-          <p>Current holder of the bomb: </p>
-          <img src={bombHolder.picture} />
-
-          <div className='timeLockDisplay'>
-            <p className='timeLeft'>Time left:</p>
-            <p className='timer'>0:{doubleTime}</p>
-          </div>
-      </div>
-      );
-
-    } else {
+    else if (selected) {
 
       return (
         <div>
@@ -92,6 +91,20 @@ class Spectator extends Component {
             <p className='timer'>0:{doubleTime}</p>
           </div>
         </div>
+      );
+
+    } else {
+
+      return (
+      <div>
+        <p>Current holder of the bomb: </p>
+        <img src={bombHolder.picture} />
+
+        <div className='timeLockDisplay'>
+          <p className='timeLeft'>Time left:</p>
+          <p className='timer'>0:{doubleTime}</p>
+        </div>
+      </div>
       );
 
     }

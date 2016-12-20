@@ -5,7 +5,8 @@ import {Match, Redirect} from 'react-router';
 import Router from 'react-router/BrowserRouter';
 import IO from 'socket.io-client';
 
-const timerTime = 1;
+const timerTime = 10;
+const waitTime = 2000;
 
 import {
   Menu,
@@ -32,11 +33,11 @@ type state = {
   room: string,
   bombHolder: Object,
   newBombHolder: Object,
+  picture: string,
   time: number,
   dead: boolean,
   error: string,
   winner: boolean,
-  winningPlayer: Object,
   received: boolean,
   given: boolean
 }
@@ -51,10 +52,10 @@ class App extends Component {
     playersInMyRoom: [],
     possibleHolders: [],
     room: ``,
+    picture: ``,
     bombHolder: {},
     newBombHolder: {},
     time: timerTime,
-    winningPlayer: {},
     dead: false,
     error: ``,
     winner: false,
@@ -90,7 +91,7 @@ class App extends Component {
     this.socket.on(`startGame`, data => this.startGameWSHandler(data));
     this.socket.on(`randomBombHolder`, data => this.setBombHolderWSHandler(data));
     this.socket.on(`newBombHolder`, data => this.setBombHolderWSHandler(data));
-    this.socket.on(`winner`, player => this.winnerWSHandler(player));
+    this.socket.on(`winner`, () => this.winnerWSHandler());
     this.socket.on(`passBomb`, possibleHolders => this.passBombWSHandler(possibleHolders));
     this.socket.on(`received`, time => this.receivedWSHandler(time));
     this.socket.on(`given`, to => this.givenWSHandler(to));
@@ -120,13 +121,11 @@ class App extends Component {
     this.setState({possibleHolders});
   }
 
-  winnerWSHandler(player: Player) {
+  winnerWSHandler() {
     let {winner} = this.state;
     winner = true;
-    this.setState({
-      winner,
-      winningPlayer: player
-    });
+
+    this.setState({winner});
     router.transitionTo(`/winner`);
   }
 
@@ -154,7 +153,7 @@ class App extends Component {
     let {time, dead} = this.state;
     const {room, playersInMyRoom} = this.state;
 
-    this.clearTimer();
+    time = timerTime;
 
     this.timer = setInterval(() => {
 
@@ -170,23 +169,44 @@ class App extends Component {
           //jezelf uit de room verwijderen
           this.socket.emit(`leave`, this.socket.id);
           //nieuwe random bombholder zoeken
-          this.socket.emit(`randomBombHolder`, room);
+          if (playersInMyRoom.length !== 2) {
+            this.socket.emit(`randomBombHolder`, room);
+          }
 
           router.transitionTo(`/dead`);
         }
 
       } else {
-        if (playersInMyRoom === 2) this.setState({winner: true});
+
+        if (time <= 0) {
+          //als time over is, je hebt de bom niet en er zijn nog 2 spelers over, dan moet jij wel gewonnen hebben
+          if (playersInMyRoom.length === 2) {
+            //2s wachten tot winner getoond wordt
+            setTimeout(() => {
+              this.setState({winner: true});
+              router.transitionTo(`/winner`);
+            }, waitTime);
+            return;
+          }
+        }
+
         //jij hebt niet de bom
         console.log(time, `Currently holding the bomb: ${bombHolder.id}`);
+
       }
 
+      //als tijd = 0 dan is er iemand dood en moet de timer reset worden
       if (time <= 0) {
         console.log(`Player ${bombHolder.id} is dood!`);
-        this.clearTimer();
+        clearInterval(this.timer);
+        setTimeout(() => {
+          this.setState({time: 0});
+          this.clearTimer();
+        }, waitTime);
         return;
       }
 
+      //tijd is nog niet 0 dus aftrekken en opnieuw setten
       time --;
       this.setState({time});
       console.log(`You have ${time} seconds left!`);
@@ -196,15 +216,12 @@ class App extends Component {
   }
 
   clearTimer() {
-    //time opnieuw setten naar globaal nummer
-    this.setState({time: timerTime});
     //interval clearen
     clearInterval(this.timer);
   }
 
   setBombHolderWSHandler(bombHolder: Object) {
 
-    this.clearTimer();
     this.startTimer(bombHolder);
 
     console.log(`New bomb holder = ${bombHolder.id}`);
@@ -304,7 +321,22 @@ class App extends Component {
     console.log(`Total players: ${allPlayers}`);
   }
 
+  launchIntoFullscreen(element: Object) {
+    if (element.requestFullscreen) {
+      element.requestFullscreen();
+    } else if (element.mozRequestFullScreen) {
+      element.mozRequestFullScreen();
+    } else if (element.webkitRequestFullscreen) {
+      element.webkitRequestFullscreen();
+    } else if (element.msRequestFullscreen) {
+      element.msRequestFullscreen();
+    }
+  }
+
   addRoomHandler() {
+
+    const elem = document.body; // Make the body go full screen.
+    this.launchIntoFullscreen(elem);
 
     this.socket.emit(`createRoom`);
 
@@ -325,6 +357,9 @@ class App extends Component {
   takePictureHandler(myPictureData: string) {
     const {room} = this.state;
     this.socket.emit(`newPicture`, myPictureData);
+
+    this.setState({picture: myPictureData});
+
     router.transitionTo(`/rooms/${room}/wait`);
   }
 
@@ -466,13 +501,12 @@ class App extends Component {
 
                 //check doen nog op players in my room
 
-                const {winner, winningPlayer} = this.state;
-
-                console.log(winningPlayer);
+                const {winner, picture} = this.state;
 
                 if (winner) {
                   return (<Winner
-                    winningPlayer={winningPlayer}
+                    /* winner is nog niet op tijd bepaald dus die blijft leeg voor ong een seconde */
+                    picture={picture}
                   />);
                 } else {
                   return (

@@ -38,6 +38,9 @@ class Menu extends Component {
     e.preventDefault();
     const {onCheckRoom} = this.props;
     onCheckRoom(this.code.value);
+
+    const elem = document.body; // Make the body go full screen.
+    this.launchIntoFullscreen(elem);
   }
 
   limitInput() {
@@ -45,6 +48,18 @@ class Menu extends Component {
       this.code.value = this.code.value.slice(0, 4);
     }
     this.setState({checkCode: this.code.value});
+  }
+
+  launchIntoFullscreen(element: Object) {
+    if (element.requestFullscreen) {
+      element.requestFullscreen();
+    } else if (element.mozRequestFullScreen) {
+      element.mozRequestFullScreen();
+    } else if (element.webkitRequestFullscreen) {
+      element.webkitRequestFullscreen();
+    } else if (element.msRequestFullscreen) {
+      element.msRequestFullscreen();
+    }
   }
 
   render() {
