@@ -1,5 +1,3 @@
-const Timer = require(`./Timer`);
-
 module.exports.register = (server, options, next) => {
 
   const io = require(`socket.io`)(server.listener);
@@ -23,10 +21,6 @@ module.exports.register = (server, options, next) => {
       started: false,
       timer: 0
     };
-
-    //timer aanmaken zodat je het overal kan aanspreken
-    const time = 10;
-    const timer = new Timer(io, {}, room, time);
 
     players.push(player);
 
@@ -107,7 +101,6 @@ module.exports.register = (server, options, next) => {
 
       if (possibleHolders.length === 0) {
         //is nodig voor als de laatste van de 2 wegvalt, dan win je sowieso
-        timer.reset();
         socket.emit(`winner`);
       } else {
         io.in(room.id).emit(`passBomb`, possibleHolders);
@@ -116,7 +109,6 @@ module.exports.register = (server, options, next) => {
     });
 
     socket.on(`startGame`, () => {
-      timer.reset();
       //room op starten zetten zodat je niet meer kan joinen
       room.started = true;
 
@@ -132,15 +124,12 @@ module.exports.register = (server, options, next) => {
       //in playersInMyRoom zoeken naar een random player -> deze krijgt de bom
       const bombHolder = playersInMyRoom[Math.floor(Math.random() * playersInMyRoom.length)];
 
-      //tijd starten
-      timer.start(bombHolder, time);
-
-      io.in(room.id).emit(`startGame`, {bombHolder, time});
+      //tijd wordt op de client geregeld
+      io.in(room.id).emit(`startGame`, bombHolder);
 
     });
 
     socket.on(`newBombHolder`, bombHolder => {
-      timer.reset();
 
       //eigen room ophalen voor de players te vinden
       const mySocketRoom = socketRooms[room.id];
@@ -155,28 +144,27 @@ module.exports.register = (server, options, next) => {
       //als playersInMyRoom nog maar 1 speler bevat dan heeft die gewonnen
       if (playersInMyRoom.length === 1) {
         console.log(`${playersInMyRoom[0].id} wins!`);
+        io.in(room.id).emit(`clearTimer`);
         io.in(room.id).emit(`winner`);
         room.id = ``;
-        timer.reset();
         return;
       }
 
+      io.in(room.id).emit(`clearTimer`);
       //received versturen naar degene die de bom krijgt
-      io.in(bombHolder.id).emit(`received`, time);
+      io.in(bombHolder.id).emit(`received`);
       //given sturen naar degene die de bom net weg heeft gedaan
       socket.emit(`given`, bombHolder);
 
       //nieuwe bombholder wordt er pas later ingestoken dus oude blijft zitten tot een nieuwe is gekozen
       setTimeout(() => {
         //tijd opnieuw starten met nieuwe bombHolder na x seconden
-        timer.start(bombHolder, time);
-        io.in(room.id).emit(`newBombHolder`, {bombHolder, time});
-      }, 3000);
+        io.in(room.id).emit(`newBombHolder`, bombHolder);
+      }, 1500);
 
     });
 
     socket.on(`randomBombHolder`, (myRoom = room.id) => {
-      timer.reset();
 
       //eigen room ophalen voor de players te vinden
       //deze handler wordt ook gebruikt voor als je dood bent en dan kent die room.id niet meer
@@ -203,9 +191,8 @@ module.exports.register = (server, options, next) => {
 
       //timeout van 3s vooraleer het terug begint
       setTimeout(() => {
-        timer.start(bombHolder, time);
-        io.in(myRoom).emit(`randomBombHolder`, {bombHolder, time});
-      }, 3000);
+        io.in(myRoom).emit(`randomBombHolder`, bombHolder);
+      }, 1500);
 
     });
 
