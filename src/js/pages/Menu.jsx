@@ -88,7 +88,7 @@ class Menu extends Component {
           <div className='codeinputwrapper'>
             <label htmlFor='code' className='lockicon'></label>
             <input ref={code => this.code = code} onChange={() => this.limitInput()} value={checkCode} className='codeinput' id='code' min='1000' max='9999' size='4' type='number' placeholder='XXXX' />
-            <button className='inputbutton' onClick={() => this.handleSubmit()}></button>
+            <button className='inputbutton'></button>
           </div>
 
           <p className='error'>{error}</p>
