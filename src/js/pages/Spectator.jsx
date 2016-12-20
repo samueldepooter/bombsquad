@@ -58,11 +58,6 @@ class Spectator extends Component {
         <div>
           <p>You have received the bomb from: </p>
           <img src={bombHolder.picture} />
-
-          <div className='timeLockDisplay'>
-            <p className='timeLeft'>Time left:</p>
-            <p className='timer'>0:{doubleTime}</p>
-          </div>
       </div>
       );
 

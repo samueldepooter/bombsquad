@@ -176,7 +176,7 @@ class TakePicture extends Component {
       return (
       <div>
         <img src='' className='myImg' />
-        <video className='video' width='85rem' autoPlay>Taking picture is not available!</video>
+        <video className='video' width='85rem' preload='true' loop autoPlay>Taking picture is not available!</video>
       </div>);
     }
   }
