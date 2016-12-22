@@ -70,6 +70,8 @@ module.exports.register = (server, options, next) => {
 
       const playersInMyRoom = findOtherPlayersInRoom(room, playerId);
 
+      console.log(`playersInMyRoom`, playersInMyRoom.length);
+
       const possibleHolders = [];
       //als er minder dan 4 players nog over zijn, ze allemaal altijd pushen
       let maxPlayers;

@@ -6,7 +6,7 @@ const PassBomb = (props: {time: string, renderFutureBombHolders: () => void}) =>
 
       <header className='globalheader'>
         <div className='screw screwleft'></div>
-        <h2>Choose someone that deserves the bomb</h2>
+        <h2>Who deserves the bomb next?</h2>
         <div className='screw screwright'></div>
       </header>
 

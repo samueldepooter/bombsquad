@@ -4,9 +4,9 @@ import React, {Component} from 'react';
 import {Match, Redirect} from 'react-router';
 import Router from 'react-router/BrowserRouter';
 import IO from 'socket.io-client';
-import Tone from 'tone';
+//import Tone from 'tone';
 
-const timerTime = 1000;
+const timerTime = 5;
 const waitTime = 2000;
 
 import {
@@ -311,6 +311,10 @@ class App extends Component {
     let {error} = this.state;
     error = `Room ${id} was not found :(`;
     this.setState({error});
+
+    setTimeout(() => {
+      this.setState({error: ``});
+    }, 2000);
   }
 
   joinedWSHandler(player: {id: string, picture: string, room: string}) {
@@ -411,7 +415,9 @@ class App extends Component {
     this.socket.emit(`vaultOpen`);
   }
 
-  passBombHandler(player: Player) {
+  passBombHandler(e: Object, player: Player) {
+
+    e.preventDefault();
 
     const {powerups, time} = this.state;
 
@@ -431,7 +437,9 @@ class App extends Component {
     this.socket.emit(`newBombHolder`, player);
   }
 
-  shieldClickHandler() {
+  shieldClickHandler(e: Object) {
+
+    e.preventDefault();
 
     //checken of je wel een shield hebt
     const {powerups} = this.state;
@@ -444,7 +452,9 @@ class App extends Component {
     this.setState({powerups});
   }
 
-  soundClickHandler() {
+  soundClickHandler(e: Object) {
+
+    e.preventDefault();
 
     //checken of je wel een shield hebt
     const {powerups, bombHolder} = this.state;
@@ -514,7 +524,7 @@ class App extends Component {
                   return (<BombHolder
                     time={time}
                     onOpenVault={() => this.openVaultHandler()}
-                    onPassBomb={player => this.passBombHandler(player)}
+                    onPassBomb={(e, player) => this.passBombHandler(e, player)}
                     possibleHolders={possibleHolders}
                     given={given}
                     newBombHolder={newBombHolder}
@@ -527,8 +537,8 @@ class App extends Component {
                     id={this.socket.id}
                     received={received}
                     powerups={powerups}
-                    onSoundClick={() => this.soundClickHandler()}
-                    onShieldClick={() => this.shieldClickHandler()}
+                    onSoundClick={e => this.soundClickHandler(e)}
+                    onShieldClick={e => this.shieldClickHandler(e)}
                     error={error}
                   />);
                 }

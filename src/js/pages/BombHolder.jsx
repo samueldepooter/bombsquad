@@ -127,20 +127,19 @@ class BombHolder extends Component {
     }
   }
 
-
   renderFutureBombHolders() {
     const {possibleHolders, onPassBomb} = this.props;
 
     return possibleHolders.map((player, i) => {
       return (
-        <li className='playerPicture' style={{backgroundImage: `url(${player.picture})`}} key={i} onClick={() => onPassBomb(player)}></li>
+        <li className='playerPicture' style={{backgroundImage: `url(${player.picture})`}} key={i} onClick={e => onPassBomb(e, player)}></li>
       );
     });
   }
 
   render() {
 
-    const {time, possibleHolders, given, newBombHolder} = this.props;
+    const {time, possibleHolders, given, newBombHolder, onOpenVault} = this.props;
     const doubleTime = double(time);
 
     if (given) {
@@ -170,7 +169,7 @@ class BombHolder extends Component {
             <p className='timer'>0:{doubleTime}</p>
           </div>
 
-          {/* <button onClick={e => onOpenVault(e)}>Open vault</button> */}
+          <button onClick={e => onOpenVault(e)}>Open vault</button>
 
           <div className='screw topleft'></div>
           <div className='screw topright'></div>
