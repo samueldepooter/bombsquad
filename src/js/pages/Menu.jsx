@@ -40,9 +40,8 @@ class Menu extends Component {
     onCheckRoom(this.code.value);
     this.setState({checkCode: ``});
 
-
-    const elem = document.body; // Make the body go full screen.
-    this.launchIntoFullscreen(elem);
+    //const elem = document.body; // Make the body go full screen.
+    //this.launchIntoFullscreen(elem);
   }
 
   limitInput() {
