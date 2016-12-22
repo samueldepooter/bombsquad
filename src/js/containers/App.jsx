@@ -4,8 +4,9 @@ import React, {Component} from 'react';
 import {Match, Redirect} from 'react-router';
 import Router from 'react-router/BrowserRouter';
 import IO from 'socket.io-client';
+import Tone from 'tone';
 
-const timerTime = 2;
+const timerTime = 1000;
 const waitTime = 2000;
 
 import {
@@ -15,7 +16,8 @@ import {
   BombHolder,
   Spectator,
   Dead,
-  Winner
+  Winner,
+  Rotation
 } from '../pages/';
 
 let router: Object = {};
@@ -111,6 +113,11 @@ class App extends Component {
 
   jammedWSHandler() {
     console.log(`You have been jammed!`);
+
+
+
+
+
 
     //hier fucken met het geluid
   }
@@ -400,8 +407,7 @@ class App extends Component {
     this.socket.emit(`startGame`);
   }
 
-  openVaultHandler(e: Object) {
-    e.preventDefault();
+  openVaultHandler() {
     this.socket.emit(`vaultOpen`);
   }
 
@@ -507,7 +513,7 @@ class App extends Component {
                 if (bombHolder.id === this.socket.id) {
                   return (<BombHolder
                     time={time}
-                    onOpenVault={e => this.openVaultHandler(e)}
+                    onOpenVault={() => this.openVaultHandler()}
                     onPassBomb={player => this.passBombHandler(player)}
                     possibleHolders={possibleHolders}
                     given={given}
@@ -560,6 +566,12 @@ class App extends Component {
                     }} />
                   );
                 }
+              }}
+            />
+            <Match
+              exactly pattern='/rotation'
+              render={() => {
+                return (<Rotation />);
               }}
             />
             <Match exactly pattern='/*' render={() => {

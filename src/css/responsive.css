@@ -1,12 +1,6 @@
 
 @media only screen and (max-device-width: 375px) {
 
-  .container .winner .playerPicture,
-  .container .spectator .playerPicture {
-    width: 25rem;
-    height: 25rem;
-  }
-
   .phonewrapper .globalheader h2 {
     font-size: 1.7rem;
   }
@@ -138,12 +132,6 @@
     height: 6rem;
   }
 
-  .container .winner .playerPicture,
-  .container .spectator .playerPicture {
-    width: 15rem;
-    height: 15rem;
-  }
-
   .bombwrapper .bombholders li:nth-child(1) {
     left: 0;
     top: 0;
@@ -180,6 +168,22 @@
   .menu .bombmenu {
     width: 40rem;
     background-position: -2rem 14rem;
+  }
+
+}
+
+@media only screen and (max-device-height: 710px) {
+
+  .timeLockDisplay .timer {
+    font-size: 10vh;
+  }
+
+  .powerupsWrapper .powerup {
+    transform: scale(.7, .7);
+  }
+
+  .powerupsWrapper {
+    padding: 1rem 0;
   }
 
 }
