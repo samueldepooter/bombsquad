@@ -97,8 +97,8 @@ class TakePicture extends Component {
 
         img.onload = () => {
 
-          const MAX_WIDTH = 800;
-          const MAX_HEIGHT = 600;
+          const MAX_WIDTH = 200;
+          const MAX_HEIGHT = 150;
 
           let width = img.width;
           let height = img.height;
