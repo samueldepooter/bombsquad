@@ -6,7 +6,7 @@ import Router from 'react-router/BrowserRouter';
 import IO from 'socket.io-client';
 //import Tone from 'tone';
 
-const timerTime = 5;
+const timerTime = 20;
 const waitTime = 2000;
 
 import {

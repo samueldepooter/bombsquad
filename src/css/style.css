@@ -819,18 +819,19 @@ input[placeholder] {
 }
 
 .winnerPicture p {
-  margin-top: 3rem;
+  margin-top: 2rem;
   text-align: center;
   width: 80%;
-  font-size: 2.5rem;
+  font-size: 1.8rem;
 }
 
 .winner .playerPicture,
-.spectator .playerPicture {
+.spectator .playerPicture,
+.rip .playerPicture {
   width: 40vh;
   height: 40vh;
   margin: 4vh 0;
-  border-radius: 25rem;
+  border-radius: 100%;
   border: 1rem solid #ffb510;
   box-shadow: 0 1.5rem 0 rgba(0, 0, 0, .07);
 }
