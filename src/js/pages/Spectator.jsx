@@ -1,10 +1,14 @@
 import React, {Component} from 'react';
+import {Received, Rip, Selected} from '../components';
 import double from '../globals/double';
 
 type Player = {
   id: string,
-  picture: string,
-  room: string
+  picture: string
+}
+
+type Powerups = {
+  jammer: boolean
 }
 
 type Props = {
@@ -12,8 +16,11 @@ type Props = {
   bombHolder: Object,
   possibleHolders: Array<Player>,
   id: string,
-  onPassBomb: () => void,
-  received: boolean
+  onSoundClick: () => void,
+  onShieldClick: () => void,
+  received: boolean,
+  powerups: Powerups,
+  error: string
 }
 
 class Spectator extends Component {
@@ -22,21 +29,94 @@ class Spectator extends Component {
   state = {};
 
   renderFutureBombHolders() {
-    const {possibleHolders, onPassBomb} = this.props;
+    const {possibleHolders} = this.props;
 
     return possibleHolders.map((player, i) => {
       return (
-        <li className='playerPicture' style={{backgroundImage: `url(${player.picture})`}} onClick={() => onPassBomb(player)} key={i}></li>
+        <li className='playerPicture' style={{backgroundImage: `url(${player.picture})`}} key={i}></li>
       );
     });
   }
 
-  activateShield() {
-    console.log(`shield`);
+  renderPowerups(selected) {
+
+    const {onShieldClick, onSoundClick} = this.props;
+
+    this.addPowerupStyling();
+    this.checkPowerupState(selected);
+
+    return (
+      <ul className='powerupsList'>
+        <li className='shield powerup' onClick={() => onShieldClick()}></li>
+        <li className='sound powerup' onClick={() => onSoundClick()}></li>
+      </ul>
+    );
   }
 
-  activateSound() {
-    console.log(`sound`);
+  addPowerupStyling() {
+
+    const {powerups} = this.props;
+
+    const shield = document.querySelector(`.shield`);
+    const sound = document.querySelector(`.sound`);
+
+    if (!shield) return;
+    if (!sound) return;
+
+    if (powerups.shield) shield.classList.add(`shieldactive`);
+    else shield.classList.remove(`shieldactive`);
+
+    if (powerups.jammer) sound.classList.add(`soundactive`);
+    else sound.classList.remove(`soundactive`);
+
+  }
+
+  checkPowerupState(selected) {
+
+    const {powerups} = this.props;
+
+    //css removen wanneer je de powerup niet mag/kan gebruiken
+
+    const shield = document.querySelector(`.shield`);
+    const sound = document.querySelector(`.sound`);
+
+    if (!shield) return;
+    if (!sound) return;
+
+    //ben je geselecteerd om de bom te krijgen
+    if (selected) {
+      if (powerups.shield) shield.classList.add(`shieldactive`);
+      else shield.classList.remove(`shieldactive`);
+
+      //sound kan je enkel gebruiken als iemand de safe nog niet geopend heeft
+      sound.classList.remove(`soundactive`);
+    } else {
+      //standaard scherm dat je ziet als iemand anders de bom aan het unlocken is
+      shield.classList.remove(`shieldactive`);
+      if (powerups.jammer) sound.classList.add(`soundactive`);
+      else sound.classList.remove(`soundactive`);
+    }
+
+  }
+
+  renderError() {
+
+    const {error} = this.props;
+
+    if (!error) {
+      return (
+        <div className='errorNotificationWrap'>
+          <p className='errorNotification'>{error}</p>
+        </div>
+      );
+
+    }
+
+    return (
+      <div className='errorNotificationWrap errorShow'>
+        <p className='errorNotification'>{error}</p>
+      </div>
+    );
   }
 
   render() {
@@ -44,89 +124,40 @@ class Spectator extends Component {
     const {time, bombHolder, possibleHolders, id, received} = this.props;
     const doubleTime = double(time);
 
-    const selected = possibleHolders.find(p => {
-      return p.id === id;
-    });
-
-    console.log(time);
+    const selected = possibleHolders.find(p => {return p.id === id;});
 
     if (time <= 0) {
+      return <Rip bombHolder={bombHolder} />;
+    } else if (received) {
+      return <Received time={time} bombHolder={bombHolder} />;
+    } else if (selected) {
+      return <Selected selected={selected} renderError={() => this.renderError()} renderFutureBombHolders={() => this.renderFutureBombHolders()} renderPowerups={() => this.renderPowerups(selected)} />;
+    } else {
       return (
-        <section className='winner phonewrapper'>
+        <section className='spectator phonewrapper'>
           <header className='globalheader'>
             <div className='screw screwleft'></div>
-            <div className='titleWinnerWrapper'>
-              <div className='winnerBombImage'></div>
-              <h2>RIP</h2>
-            </div>
+              <h2>Current holder of the bomb:</h2>
             <div className='screw screwright'></div>
           </header>
-          <div className='winnerPicture'>
-            <div className='playerPicture' style={{backgroundImage: `url(${bombHolder.picture})`}}></div>
-            <p>The player didn't make it. Let's look for a new victim!</p>
-          </div>
-        </section>
-      );
-    }
 
-    else if (received) {
-
-      return (
-        <div>
-          <p>You have received the bomb from: </p>
-          <img src={bombHolder.picture} />
-      </div>
-      );
-
-    }
-
-    else if (selected) {
-
-      return (
-
-        <div>
-          <p>Prepare yourself, you might receive the bomb!</p>
-          <p>The bomb holder can pick from these players</p>
-          <ul className='players'>
-            {this.renderFutureBombHolders()}
-          </ul>
+          <div className='playerPicture' style={{backgroundImage: `url(${bombHolder.picture})`}}></div>
 
           <div className='timeLockDisplay'>
             <p className='timeLeft'>Time left:</p>
             <p className='timer'>0:{doubleTime}</p>
           </div>
-        </div>
+
+          <div className='powerupsWrapper'>
+            <p>Powerups:</p>
+            {this.renderPowerups(selected)}
+          </div>
+
+          {this.renderError()}
+
+        </section>
       );
-
-    } else {
-
-      return (
-      <section className='spectator phonewrapper'>
-        <header className='globalheader'>
-          <div className='screw screwleft'></div>
-            <h2>Current holder of the bomb:</h2>
-          <div className='screw screwright'></div>
-        </header>
-
-        <div className='playerPicture' style={{backgroundImage: `url(${bombHolder.picture})`}}></div>
-
-        <div className='timeLockDisplay'>
-          <p className='timeLeft'>Time left:</p>
-          <p className='timer'>0:{doubleTime}</p>
-        </div>
-
-        <div className='powerupsWrapper'>
-          <p>Powerups:</p>
-          <ul className='powerupsList'>
-            <li className='shield powerup shieldactive' onClick={() => this.activateShield()}></li>
-            <li className='sound powerup' onClick={() => this.activateSound()}></li>
-          </ul>
-        </div>
-      </section>
-      );
-
     }
-
   }
 
 }

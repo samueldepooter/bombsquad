@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {Given, PassBomb} from '../components';
 import {isEmpty} from 'lodash';
 import double from '../globals/double';
 import Tone from 'tone';
@@ -19,11 +20,8 @@ const pitchCounter = 0;
 
 let wheelFront, wheelShadow, statusGreen;
 
-
 //dynamische values
 const interval = 10;
-
-
 
 type Player = {
   id: string,
@@ -135,11 +133,7 @@ class BombHolder extends Component {
 
     return possibleHolders.map((player, i) => {
       return (
-        <li className='player' key={i}>
-          <div className='playerPictureWrap'>
-            <img src={player.picture} className='playerPicture' onClick={() => onPassBomb(player)} />
-          </div>
-        </li>
+        <li className='playerPicture' style={{backgroundImage: `url(${player.picture})`}} key={i} onClick={() => onPassBomb(player)}></li>
       );
     });
   }
@@ -150,34 +144,11 @@ class BombHolder extends Component {
     const doubleTime = double(time);
 
     if (given) {
+      return <Given newBombHolder={newBombHolder} time={time} />;
+    } else if (!isEmpty(possibleHolders)) {
+      return <PassBomb time={doubleTime} renderFutureBombHolders={() => this.renderFutureBombHolders()} />;
+    } else {
       return (
-        <div>
-          <p>You gave the bomb to: </p>
-          <img src={newBombHolder.picture} />
-        </div>
-      );
-    }
-
-    else if (!isEmpty(possibleHolders)) {
-      return (
-        <div>
-          <p>Choose someone that deserves the bomb</p>
-
-          <ul className='players'>
-            {this.renderFutureBombHolders()}
-          </ul>
-
-          <div className='timeLockDisplay'>
-            <p className='timeLeft'>Time left:</p>
-            <p className='timer'>0:{doubleTime}</p>
-          </div>
-        </div>
-      );
-    }
-
-    else {
-      return (
-
         <section className='lock'>
           <header className='turnPhone'>
               <div className='phoneIcon'></div>
@@ -195,15 +166,11 @@ class BombHolder extends Component {
           </div>
 
           <div className='timeLockDisplay'>
-            <p className='timeLeft'>Time left:</p>
+            <p className='timeLeft'>Time left</p>
             <p className='timer'>0:{doubleTime}</p>
           </div>
 
           {/* <button onClick={e => onOpenVault(e)}>Open vault</button> */}
-
-          {/* <div className='totalTime'>
-            <div className='currentTime'></div>
-          </div> */}
 
           <div className='screw topleft'></div>
           <div className='screw topright'></div>

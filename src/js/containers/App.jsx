@@ -4,6 +4,7 @@ import React, {Component} from 'react';
 import {Match, Redirect} from 'react-router';
 import Router from 'react-router/BrowserRouter';
 import IO from 'socket.io-client';
+import Tone from 'tone';
 
 const timerTime = 1000;
 const waitTime = 2000;
@@ -23,8 +24,12 @@ let router: Object = {};
 
 type Player = {
   id: string,
-  picture: string,
-  room: string
+  picture: string
+}
+
+type Powerups = {
+  jammer: boolean,
+  shield: boolean
 }
 
 type state = {
@@ -35,6 +40,7 @@ type state = {
   bombHolder: Object,
   newBombHolder: Object,
   picture: string,
+  powerups: Powerups,
   time: number,
   dead: boolean,
   error: string,
@@ -45,15 +51,16 @@ type state = {
 
 class App extends Component {
 
-
-  //dead op false zetten!!
-
   state: state = {
     players: 0,
     playersInMyRoom: [],
     possibleHolders: [],
     room: ``,
     picture: ``,
+    powerups: {
+      shield: false,
+      jammer: false
+    },
     bombHolder: {},
     newBombHolder: {},
     time: timerTime,
@@ -73,8 +80,6 @@ class App extends Component {
   initSocket() {
     this.socket = IO(`/`);
 
-    this.socket.on(`connect`, this.initPeer);
-
     //1 player toevoegen als je reeds gejoined bent en iemand anders joined ook
     this.socket.on(`add`, player => this.addWSHandler(player));
     this.socket.on(`remove`, playerId => this.removeWSHandler(playerId));
@@ -90,6 +95,7 @@ class App extends Component {
 
     this.socket.on(`pictureTaken`, player => this.pictureTakenWSHandler(player));
     this.socket.on(`startGame`, data => this.startGameWSHandler(data));
+
     this.socket.on(`randomBombHolder`, data => this.setBombHolderWSHandler(data));
     this.socket.on(`newBombHolder`, data => this.setBombHolderWSHandler(data));
     this.socket.on(`winner`, () => this.winnerWSHandler());
@@ -97,14 +103,48 @@ class App extends Component {
     this.socket.on(`received`, time => this.receivedWSHandler(time));
     this.socket.on(`given`, to => this.givenWSHandler(to));
     this.socket.on(`clearTimer`, () => this.clearTimer());
+    this.socket.on(`jammerUsed`, status => this.jammerUsedWSHandler(status));
+    this.socket.on(`jammed`, () => this.jammedWSHandler());
   }
 
   setRouter(setRouter: Object) {
     router = setRouter;
   }
 
-  initPeer() {
-    console.log(`Init die peer`);
+  jammedWSHandler() {
+    console.log(`You have been jammed!`);
+
+
+
+
+
+
+    //hier fucken met het geluid
+  }
+
+  jammerUsedWSHandler(status: boolean) {
+    let {error} = this.state;
+
+    //je hebt de jammer kunnen gebruiken
+    if (status) {
+
+      error = `You jam the bombholder!`;
+
+      //jammer resetten
+      const {powerups} = this.state;
+      powerups.jammer = false;
+      this.setState({powerups, error});
+
+      setTimeout(() => this.setState({error: ``}), 1500);
+
+    } else {
+
+      error = `A jammer is already being used!`;
+      this.setState({error});
+
+      setTimeout(() => this.setState({error: ``}), 1500);
+
+    }
   }
 
   givenWSHandler(to: Player) {
@@ -132,7 +172,7 @@ class App extends Component {
 
   busyWSHandler(id: string) {
     let {error} = this.state;
-    error = `Room ${id} is already playing`;
+    error = `Room ${id} is already playing :(`;
 
     this.setState({error});
   }
@@ -160,7 +200,6 @@ class App extends Component {
 
       //jij hebt de bom
       if (bombHolder.id === this.socket.id) {
-        console.log(time, `You are holding the bomb`);
 
         //als je tijd op is ben je zelf dood
         if (time <= 0) {
@@ -182,7 +221,7 @@ class App extends Component {
         if (time <= 0) {
           //als time over is, je hebt de bom niet en er zijn nog 2 spelers over, dan moet jij wel gewonnen hebben
           if (playersInMyRoom.length === 2) {
-            //2s wachten tot winner getoond wordt
+            //2s wachten tot winner getoond wordt zodat je het RIP scherm kunt zien
             setTimeout(() => {
               this.setState({winner: true});
               router.transitionTo(`/winner`);
@@ -336,8 +375,8 @@ class App extends Component {
 
   addRoomHandler() {
 
-    // const elem = document.body; // Make the body go full screen.
-    // this.launchIntoFullscreen(elem);
+    //const elem = document.body; // Make the body go full screen.
+    //this.launchIntoFullscreen(elem);
 
     this.socket.emit(`createRoom`);
 
@@ -369,18 +408,50 @@ class App extends Component {
   }
 
   openVaultHandler() {
-    this.socket.emit(`vaultOpen`, this.socket.id);
+    this.socket.emit(`vaultOpen`);
   }
 
   passBombHandler(player: Player) {
+
+    const {powerups, time} = this.state;
+
+    //pass je in sneller dan 10s, dan krijg je een jammer
+    const checkTime = timerTime - time;
+    if (checkTime <= 10) {
+      powerups.jammer = true;
+      this.setState({powerups: powerups});
+    }
+
+    this.clearTimer();
+
     setTimeout(() => {
-      this.setState({
-        possibleHolders: [],
-        time: timerTime
-      });
+      this.setState({possibleHolders: []});
     }, 250);
 
     this.socket.emit(`newBombHolder`, player);
+  }
+
+  shieldClickHandler() {
+
+    //checken of je wel een shield hebt
+    const {powerups} = this.state;
+    if (!powerups.shield) return;
+
+    console.log(`Use the shield`);
+    //logica verplaatsen naar server:
+    //signaal emitten -> checken of er niet al een jammer is -> terugsturen of je het hebt kunnen gebruiken -> juiste css renderen
+    powerups.shield = false;
+    this.setState({powerups});
+  }
+
+  soundClickHandler() {
+
+    //checken of je wel een shield hebt
+    const {powerups, bombHolder} = this.state;
+    if (!powerups.jammer) return;
+
+    console.log(`Use the jammer`);
+    this.socket.emit(`jammer`, bombHolder.id);
   }
 
   render() {
@@ -438,7 +509,7 @@ class App extends Component {
             <Match
               exactly pattern='/rooms/:id/game'
               render={() => {
-                const {bombHolder, newBombHolder, possibleHolders, received, given} = this.state;
+                const {bombHolder, newBombHolder, possibleHolders, received, given, powerups} = this.state;
                 if (bombHolder.id === this.socket.id) {
                   return (<BombHolder
                     time={time}
@@ -455,6 +526,10 @@ class App extends Component {
                     possibleHolders={possibleHolders}
                     id={this.socket.id}
                     received={received}
+                    powerups={powerups}
+                    onSoundClick={() => this.soundClickHandler()}
+                    onShieldClick={() => this.shieldClickHandler()}
+                    error={error}
                   />);
                 }
               }}

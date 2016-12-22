@@ -11,14 +11,20 @@ module.exports.register = (server, options, next) => {
 
     const {id: playerId} = socket;
 
+    //enkel shield bijhouden per player omdat jammer niet nuttig is om bij te houden, shield wel zodat je kan doorgeven welke speler beschermd is
     const player = {
       id: playerId,
-      picture: ``
+      picture: ``,
+      powerups: {
+        shield: false
+      }
     };
 
+    //enkel jammer bijhouden in room omdat je moet weten of die reeds gebruikt is, 2 jammers tegelijk mag niet
     const room = {
       id: ``,
-      started: false
+      started: false,
+      jammer: false
     };
 
     players.push(player);
@@ -32,7 +38,7 @@ module.exports.register = (server, options, next) => {
     console.log(`Player with ID: ${player.id} is connected. ${players.length} spelers in totaal`);
 
     socket.on(`createRoom`, () => {
-      let number = Math.floor(Math.random() * 9000) + 1000; //generate random nummer tussen 1000 en 9999
+      let number = generateRandomNumber(1000, 9000);
       room.id = number.toString();
 
       //tussen alle rooms kijken of de gegenereerde room al bestaat
@@ -40,7 +46,7 @@ module.exports.register = (server, options, next) => {
       rooms.find(room => {
         while (room.id === number) {
           console.log(`code bestaat al - opnieuw uitvoeren`);
-          number = Math.floor(Math.random() * 9000) + 1000;
+          number = generateRandomNumber(1000, 9000);
         }
       });
 
@@ -58,21 +64,11 @@ module.exports.register = (server, options, next) => {
       socket.emit(`roomCreated`, data);
     });
 
-    socket.on(`vaultOpen`, playerId => {
+    socket.on(`vaultOpen`, () => {
 
-      console.log(`${playerId} succesfully opened the vault`);
       console.log(`Find 4 random players`);
 
-      const mySocketRoom = socketRooms[room.id];
-
-      //players uit je room halen
-      const playersInMyRoom = [];
-      Object.keys(mySocketRoom.sockets).forEach(socketPlayer => {
-        players.map(p => {
-          //degene die net de bom had er uit filteren
-          if (p.id === socketPlayer && p.id !== playerId) playersInMyRoom.push(p);
-        });
-      });
+      const playersInMyRoom = findOtherPlayersInRoom(room, playerId);
 
       const possibleHolders = [];
       //als er minder dan 4 players nog over zijn, ze allemaal altijd pushen
@@ -82,13 +78,13 @@ module.exports.register = (server, options, next) => {
 
       for (let i = 0;i < maxPlayers;i ++) {
         let randomPlayer;
-        randomPlayer = playersInMyRoom[Math.floor(Math.random() * playersInMyRoom.length)];
+        randomPlayer = findRandomPlayer(playersInMyRoom);
 
         possibleHolders.map(possibleHolder => {
           //zolang de randomplayer gelijk is een een possibleholder, opnieuw zoeken naar een randomplayer
           while (randomPlayer.id === possibleHolder.id) {
             console.log(`Waarde was hetzelfde`);
-            randomPlayer = playersInMyRoom[Math.floor(Math.random() * playersInMyRoom.length)];
+            randomPlayer = findRandomPlayer(playersInMyRoom);
           }
         });
 
@@ -111,17 +107,10 @@ module.exports.register = (server, options, next) => {
       //room op starten zetten zodat je niet meer kan joinen
       room.started = true;
 
-      //eigen room ophalen voor de players te vinden
-      const mySocketRoom = socketRooms[room.id];
-      const playersInMyRoom = [];
-      Object.keys(mySocketRoom.sockets).forEach(player => {
-        players.map(p => {
-          if (p.id === player) playersInMyRoom.push(p);
-        });
-      });
+      const playersInMyRoom = findPlayersInRoom(room);
 
       //in playersInMyRoom zoeken naar een random player -> deze krijgt de bom
-      const bombHolder = playersInMyRoom[Math.floor(Math.random() * playersInMyRoom.length)];
+      const bombHolder = findBombHolder(playersInMyRoom);
 
       //tijd wordt op de client geregeld
       io.in(room.id).emit(`startGame`, bombHolder);
@@ -130,15 +119,7 @@ module.exports.register = (server, options, next) => {
 
     socket.on(`newBombHolder`, bombHolder => {
 
-      //eigen room ophalen voor de players te vinden
-      const mySocketRoom = socketRooms[room.id];
-
-      const playersInMyRoom = [];
-      Object.keys(mySocketRoom.sockets).forEach(player => {
-        players.map(p => {
-          if (p.id === player) playersInMyRoom.push(p);
-        });
-      });
+      const playersInMyRoom = findPlayersInRoom(room);
 
       //als playersInMyRoom nog maar 1 speler bevat dan heeft die gewonnen
       if (playersInMyRoom.length === 1) {
@@ -158,30 +139,25 @@ module.exports.register = (server, options, next) => {
 
       //nieuwe bombholder wordt er pas later ingestoken dus oude blijft zitten tot een nieuwe is gekozen
       setTimeout(() => {
+        resetJammer(room);
         //tijd opnieuw starten met nieuwe bombHolder na x seconden
         io.in(room.id).emit(`newBombHolder`, bombHolder);
       }, 2000);
 
     });
 
-    socket.on(`randomBombHolder`, (myRoom = room.id) => {
+    socket.on(`randomBombHolder`, (myRoomId = room.id) => {
 
-      //eigen room ophalen voor de players te vinden
-      //deze handler wordt ook gebruikt voor als je dood bent en dan kent die room.id niet meer
-      //dus die geef ik mee via myRoom, in de andere keren dat ik randomBombHolder gebruik wordt myRoom niet ingevuld dus standaard op room.id zetten
-      const mySocketRoom = socketRooms[myRoom];
+      const room = {
+        id: myRoomId
+      };
 
-      const playersInMyRoom = [];
-      Object.keys(mySocketRoom.sockets).forEach(player => {
-        players.map(p => {
-          if (p.id === player) playersInMyRoom.push(p);
-        });
-      });
+      const playersInMyRoom = findPlayersInRoom(room);
 
       //als playersInMyRoom nog maar 1 speler bevat dan heeft die gewonnen
       if (playersInMyRoom.length === 1) {
         console.log(`${playersInMyRoom[0].id} wins!`);
-        io.in(myRoom).emit(`winner`);
+        io.in(myRoomId).emit(`winner`);
         room.id = ``;
         return;
       }
@@ -191,7 +167,8 @@ module.exports.register = (server, options, next) => {
 
       //timeout van 3s vooraleer het terug begint
       setTimeout(() => {
-        io.in(myRoom).emit(`randomBombHolder`, bombHolder);
+        resetJammer(room);
+        io.in(myRoomId).emit(`randomBombHolder`, bombHolder);
       }, 2000);
 
     });
@@ -205,24 +182,9 @@ module.exports.register = (server, options, next) => {
 
       //hier is de room zeker nog niet gestart -> je mag joinen
       socket.join(id);
-
-      //de room die je joined opvragen van socket om players te weten te komen
-      const mySocketRoom = socketRooms[id];
-
-      //lege array om alle players in te steken
-      const playersInMyRoom = [];
-
-      //elke player (is enkel het id) die in de room zit pushen naar playersInMyRoom array
-      Object.keys(mySocketRoom.sockets).forEach(player => {
-        console.log(player, `in my room`);
-        //dit id zoeken in alle players en dat object pushen naar playersInMyRoom
-        players.map(p => {
-          if (p.id === player) playersInMyRoom.push(p);
-        });
-      });
-
-      //eigen room zetten naar het id dat je gejoined bent
       room.id = id;
+
+      const playersInMyRoom = findPlayersInRoom(room);
 
       const roomData = {
         room: id,
@@ -247,14 +209,14 @@ module.exports.register = (server, options, next) => {
     });
 
     socket.on(`checkRoom`, id => {
-      const theRoom = rooms.find(room => {
-        return room.id === id;
+      const checkedRoom = rooms.find(r => {
+        return r.id === id;
       });
 
-      if (theRoom) {
+      if (checkedRoom) {
 
         //checken of de room al niet bezig is en indien het zo is returnen
-        if (theRoom.started) {
+        if (checkedRoom.started) {
           socket.emit(`busy`, id);
           return;
         }
@@ -264,6 +226,29 @@ module.exports.register = (server, options, next) => {
       } else {
         socket.emit(`notFound`, id);
       }
+
+    });
+
+    socket.on(`jammer`, bombHolderId => {
+      //room zoeken, checken of er niet al een jammer bezig is, indien niet -> jammer zetten op de room -> emitten naar de bombholder
+
+      const myRoom = rooms.find(r => {
+        return r.id === room.id;
+      });
+
+      //als die true is dan is de jammer al eens gebruikt deze ronde
+      if (myRoom.jammer) {
+        socket.emit(`jammerUsed`, false);
+        return;
+      }
+
+      //hier is die nog niet gebruikt dus op true zetten
+      myRoom.jammer = true;
+      //naar je eigen emitten dat je het hebt kunnen gebruiken
+      socket.emit(`jammerUsed`, true);
+
+      //naar de bombholder emitten dat je hem jammed
+      io.in(bombHolderId).emit(`jammed`);
 
     });
 
@@ -277,6 +262,55 @@ module.exports.register = (server, options, next) => {
     });
 
   });
+
+  const resetJammer = room => {
+    const myRoom = rooms.find(r => {return r.id === room.id;});
+    myRoom.jammer = false;
+  };
+
+  const findPlayersInRoom = room => {
+
+    //eigen room ophalen voor de players te vinden
+    const mySocketRoom = socketRooms[room.id];
+
+    const playersInMyRoom = [];
+
+    Object.keys(mySocketRoom.sockets).forEach(player => {
+      players.map(p => {
+        if (p.id === player) playersInMyRoom.push(p);
+      });
+    });
+
+    return playersInMyRoom;
+
+  };
+
+  const findBombHolder = playersInMyRoom => {
+    return playersInMyRoom[Math.floor(Math.random() * playersInMyRoom.length)];
+  };
+
+  const findOtherPlayersInRoom = (room, playerId) => {
+    const mySocketRoom = socketRooms[room.id];
+
+    //players uit je room halen
+    const playersInMyRoom = [];
+    Object.keys(mySocketRoom.sockets).forEach(socketPlayer => {
+      players.map(p => {
+        //degene die net de bom had er uit filteren
+        if (p.id === socketPlayer && p.id !== playerId) playersInMyRoom.push(p);
+      });
+    });
+
+    return playersInMyRoom;
+  };
+
+  const generateRandomNumber = (n1, n2) => {
+    return Math.floor(Math.random() * n2) + n1; //generate random nummer tussen 1000 en 9999
+  };
+
+  const findRandomPlayer = playersInMyRoom => {
+    return playersInMyRoom[Math.floor(Math.random() * playersInMyRoom.length)];
+  };
 
   next();
 

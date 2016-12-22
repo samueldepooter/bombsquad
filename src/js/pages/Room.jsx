@@ -74,7 +74,7 @@ class Room extends Component {
   showNotification(node: HTMLElement) {
     node.style.bottom = `0rem`;
     setTimeout(() => {
-      node.style.bottom = `-7rem`;
+      node.style.bottom = `-10rem`;
     }, 1500);
   }
 
