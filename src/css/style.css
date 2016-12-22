@@ -43,7 +43,7 @@ main {
   width: 3rem;
   height: 4rem;
   background-repeat: no-repeat;
-  background-image: url(../assets/screw.svg);
+  background-image: url(../assets/images/screw.svg);
   position: absolute;
   z-index: 9999;
 }
@@ -70,7 +70,7 @@ main {
 
 .bombmenu {
   position: absolute;
-  background-image: url(../assets/bombhome.svg);
+  background-image: url(../assets/images/bombhome.svg);
   width: 100%;
   height: 100%;
   background-size: 55rem;
@@ -82,7 +82,7 @@ main {
 .logo {
   margin-top: 2rem;
   background-size: contain;
-  background-image: url(../assets/logo.svg);
+  background-image: url(../assets/images/logo.svg);
   background-repeat: no-repeat;
   background-position: center center;
   max-width: 35rem;
@@ -182,7 +182,7 @@ input[placeholder] {
   width: 4rem;
   height: 4rem;
   margin-right: 1.5rem;
-  background-image: url(../assets/lock-icon.svg);
+  background-image: url(../assets/images/lock-icon.svg);
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center center;
@@ -272,7 +272,7 @@ input[placeholder] {
   width: 10rem;
   height: 10rem;
   border: 10px solid #ffb510;
-  background-image: url(../assets/camera-icon.svg);
+  background-image: url(../assets/images/camera-icon.svg);
   background-position: center center;
   background-size: 55%;
   background-repeat: no-repeat;
@@ -331,7 +331,7 @@ input[placeholder] {
   margin-top: -2px;
   height: 2rem;
   width: 100%;
-  background-image: url(../assets/red_border.svg);
+  background-image: url(../assets/images/red_border.svg);
   background-repeat: repeat-x;
   background-position: bottom left;
 }
@@ -344,7 +344,7 @@ input[placeholder] {
   border-radius: 7rem;
   border: none;
   margin-left: 2rem;
-  background-image: url(../assets/link-icon.svg);
+  background-image: url(../assets/images/link-icon.svg);
   background-size: 50%;
   background-position: center center;
   background-repeat: no-repeat;
@@ -490,7 +490,7 @@ input[placeholder] {
   border: solid 2rem #28262b;
   height: 100%;
   width: 100%;
-  background-image: url(../assets/texture.svg);
+  background-image: url(../assets/images/texture.svg);
   background-size: contain;
   display: flex;
   flex-direction: column;
@@ -530,7 +530,7 @@ input[placeholder] {
   height: 5rem;
   margin-right: 2rem;
   display: inline-block;
-  background-image: url(../assets/phone-icon.svg);
+  background-image: url(../assets/images/phone-icon.svg);
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -564,17 +564,6 @@ input[placeholder] {
   margin-top: 4rem;
 }
 
-@keyframes rotate {
-
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 .wheelFront, .wheelShadow {
   display: flex;
   justify-content: center;
@@ -584,14 +573,11 @@ input[placeholder] {
   left: 0;
   width: 36rem;
   height: 37rem;
-  background-image: url(../assets/wheelFront.svg);
+  background-image: url(../assets/images/wheelFront.svg);
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center center;
-  animation-name: rotate;
-  animation-duration: 3s;
-  animation-iteration-count: infinite;
-  animation-timing-function: linear;
+  transition: all 0.5s ease;
 }
 
 .wheelFront {
@@ -599,13 +585,22 @@ input[placeholder] {
 }
 
 .wheelShadow {
-  background-image: url(../assets/wheelShadow.svg);
+  background-image: url(../assets/images/wheelShadow.svg);
   position: absolute;
   top: 2rem;
   left: 0;
 }
 
-.status {
+.statusWrapper {
+  width: 6rem;
+  height: 6rem;
+  position: relative;
+}
+
+.status, .statusGreen {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 6rem;
   height: 6rem;
   background-color: #f43d25;
@@ -613,6 +608,13 @@ input[placeholder] {
   border-radius: 6rem;
   box-sizing: border-box;
   border: 6px solid rgba(0, 0, 0, .1);
+  transition: all .5s ease;
+}
+
+.statusGreen {
+  background-color: #a9ff2e;
+  z-index: 999;
+  opacity: 0;
 }
 
 .timeLockDisplay {
@@ -689,7 +691,7 @@ input[placeholder] {
   width: 8rem;
   height: 8rem;
   display: inline-block;
-  background-image: url(../assets/bomb-no-sparkles.svg);
+  background-image: url(../assets/images/bomb-no-sparkles.svg);
   background-repeat: no-repeat;
 }
 
@@ -771,7 +773,7 @@ input[placeholder] {
   height: 6.5rem;
   border-radius: 6.5rem;
   display: inline-block;
-  background-image: url(../assets/arrow.svg);
+  background-image: url(../assets/images/arrow.svg);
   background-repeat: no-repeat;
   background-position: center center;
   background-size: 3.5rem;
@@ -784,19 +786,19 @@ input[placeholder] {
 }
 
 .shield {
-  background-image: url(../assets/shield-icon-n.svg);
+  background-image: url(../assets/images/shield-icon-n.svg);
 }
 
 .shieldactive {
-  background-image: url(../assets/shield-icon.svg);
+  background-image: url(../assets/images/shield-icon.svg);
 }
 
 .sound {
-  background-image: url(../assets/sound-icon-n.svg);
+  background-image: url(../assets/images/sound-icon-n.svg);
 }
 
 .soundactive {
-  background-image: url(../assets/sound-icon.svg);
+  background-image: url(../assets/images/sound-icon.svg);
 }
 
 @import 'responsive';
