@@ -60,7 +60,7 @@ class App extends Component {
     picture: ``,
     powerups: {
       shield: false,
-      jammer: true
+      jammer: false
     },
     bombHolder: {},
     newBombHolder: {},
