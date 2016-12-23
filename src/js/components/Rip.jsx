@@ -7,13 +7,13 @@ const Rip = (props: {bombHolder: Object}) => {
         <div className='screw screwleft'></div>
         <div className='titleWinnerWrapper'>
           <div className='winnerBombImage'></div>
-          <h2>RIP</h2>
+          <h2>R.I.P</h2>
         </div>
         <div className='screw screwright'></div>
       </header>
       <div className='winnerPicture'>
         <div className='playerPicture' style={{backgroundImage: `url(${props.bombHolder.picture})`}}></div>
-        <p>This person exploded into a million pieces! <br /> Prepare yourself, it's time for a new victim!</p>
+        <p>Another one bites the dust! Time for a new victim!</p>
       </div>
     </section>
   );

@@ -47,8 +47,8 @@ class Spectator extends Component {
 
     return (
       <ul className='powerupsList'>
-        <li className='shield powerup' onClick={() => onShieldClick()}></li>
-        <li className='sound powerup' onClick={() => onSoundClick()}></li>
+        <li className='shield powerup' onClick={e => onShieldClick(e)}></li>
+        <li className='sound powerup' onClick={e => onSoundClick(e)}></li>
       </ul>
     );
   }

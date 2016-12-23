@@ -196,7 +196,7 @@ class BombHolder extends Component {
     counter ++;
     this.statusGreen.style.opacity = ((counter / 100) * 2).toString();
 
-    if (counter === 50) {
+    if (counter >= 50) {
       this.unlock.start();
       window.removeEventListener(`deviceorientation`, this.deviceOrientation, false);
       jamSource.stop();
@@ -216,7 +216,7 @@ class BombHolder extends Component {
 
   render() {
 
-    const {time, possibleHolders, given, newBombHolder} = this.props;
+    const {time, possibleHolders, given, newBombHolder, onOpenVault} = this.props;
     const doubleTime = double(time);
 
     if (given) {
@@ -246,7 +246,7 @@ class BombHolder extends Component {
             <p className='timer'>0:{doubleTime}</p>
           </div>
 
-          {/* <button onClick={e => onOpenVault(e)}>Open vault</button> */}
+          <button onClick={e => onOpenVault(e)}>Open vault</button>
 
           <div className='screw topleft'></div>
           <div className='screw topright'></div>

@@ -70,6 +70,8 @@ module.exports.register = (server, options, next) => {
 
       const playersInMyRoom = findOtherPlayersInRoom(room, playerId);
 
+      console.log(`playersInMyRoom`, playersInMyRoom.length);
+
       const possibleHolders = [];
       //als er minder dan 4 players nog over zijn, ze allemaal altijd pushen
       let maxPlayers;
@@ -97,6 +99,7 @@ module.exports.register = (server, options, next) => {
       if (possibleHolders.length === 0) {
         //is nodig voor als de laatste van de 2 wegvalt, dan win je sowieso
         socket.emit(`winner`);
+        socket.leave(room.id);
       } else {
         io.in(room.id).emit(`passBomb`, possibleHolders);
       }
@@ -123,11 +126,7 @@ module.exports.register = (server, options, next) => {
 
       //als playersInMyRoom nog maar 1 speler bevat dan heeft die gewonnen
       if (playersInMyRoom.length === 1) {
-
-        console.log(`${playersInMyRoom[0].id} wins!`);
-        //io.in(room.id).emit(`clearTimer`);
-        io.in(room.id).emit(`winner`);
-        room.id = ``;
+        youWin(room);
         return;
       }
 
@@ -156,9 +155,7 @@ module.exports.register = (server, options, next) => {
 
       //als playersInMyRoom nog maar 1 speler bevat dan heeft die gewonnen
       if (playersInMyRoom.length === 1) {
-        console.log(`${playersInMyRoom[0].id} wins!`);
-        io.in(myRoomId).emit(`winner`);
-        room.id = ``;
+        youWin(room);
         return;
       }
 
@@ -310,6 +307,11 @@ module.exports.register = (server, options, next) => {
 
   const findRandomPlayer = playersInMyRoom => {
     return playersInMyRoom[Math.floor(Math.random() * playersInMyRoom.length)];
+  };
+
+  const youWin = room => {
+    io.in(room.id).emit(`winner`);
+    return room.id = ``;
   };
 
   next();
