@@ -43,7 +43,7 @@ class BombHolder extends Component {
   wheelShadow: HTMLElement
   statusGreen: HTMLElement
   unlock: Object
-  deviceOrientation: ()=>void
+  deviceOrientation: () => void
   gamma: number
   rotationGamma: number
   random: number
@@ -197,10 +197,10 @@ class BombHolder extends Component {
     this.statusGreen.style.opacity = ((counter / 100) * 2).toString();
 
     if (counter >= 50) {
+      onOpenVault();
       this.unlock.start();
       window.removeEventListener(`deviceorientation`, this.deviceOrientation, false);
       jamSource.stop();
-      onOpenVault();
     }
   }
 
@@ -246,7 +246,7 @@ class BombHolder extends Component {
             <p className='timer'>0:{doubleTime}</p>
           </div>
 
-          {/* <button onClick={e => onOpenVault(e)}>Open vault</button> */}
+          {/* <button onClick={() => onOpenVault()}>Open vault</button> */}
 
           <div className='screw topleft'></div>
           <div className='screw topright'></div>
