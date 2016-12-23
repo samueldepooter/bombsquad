@@ -458,6 +458,10 @@ class App extends Component {
     this.socket.emit(`jammer`, bombHolder.id);
   }
 
+  setStateJamHandler(status: boolean) {
+    this.setState({jammed: status});
+  }
+
   render() {
 
     const {players, playersInMyRoom, room, error, time} = this.state;
@@ -524,6 +528,7 @@ class App extends Component {
                     newBombHolder={newBombHolder}
                     jammed={jammed}
                     dead={dead}
+                    setStateJam={status => this.setStateJamHandler(status)}
                   />);
                 } else {
                   return (<Spectator

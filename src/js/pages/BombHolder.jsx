@@ -30,7 +30,8 @@ type Props = {
   newBombHolder: Player,
   given: boolean,
   jammed:boolean,
-  dead:boolean
+  dead:boolean,
+  setStateJam: () => void
 }
 
 class BombHolder extends Component {
@@ -70,6 +71,8 @@ class BombHolder extends Component {
     this.createPitch();
     this.createGain();
     // this.playJammer();
+
+    jammedLocal = false;
 
     this.deviceOrientation = eventData => {
 
@@ -132,6 +135,7 @@ class BombHolder extends Component {
   playJammer() {
 
     const {jammed} = this.props;
+    const {setStateJam} = this.props;
 
     console.log(`jammed:`, jammed, `jammedlocal:`, jammedLocal);
 
@@ -142,6 +146,7 @@ class BombHolder extends Component {
       this.gain.connect(Tone.context.destination);
       jamSource.start();
       jammedLocal = true;
+      setStateJam(false);
     }
   }
 
@@ -189,8 +194,8 @@ class BombHolder extends Component {
     }
     // console.log(this.gain);
     // this.gain.gain.value = (90 - (this.distance / 2)) / 2;
-    this.gain.gain.value = this.map(this.distance * 10, 0, 160, 3, 0);
-    console.log(`mappinge`, this.map(this.distance * 10, 0, 160, 3, 0));
+    this.gain.gain.value = this.map(this.distance * 10, 0, 160, 1, 0);
+    console.log(`mappinge`, this.map(this.distance * 10, 0, 160, 1, 0));
     console.log(`distance`, this.distance);
 
     // console.log(`luidheid:`, (5 + this.distance) / 10);
@@ -210,7 +215,7 @@ class BombHolder extends Component {
       onOpenVault();
       this.unlock.start();
       window.removeEventListener(`deviceorientation`, this.deviceOrientation, false);
-      jamSource.stop();
+      if (jamSource) jamSource.stop();
     }
   }
 
