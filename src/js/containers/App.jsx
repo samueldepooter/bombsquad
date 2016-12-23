@@ -60,7 +60,7 @@ class App extends Component {
     picture: ``,
     powerups: {
       shield: false,
-      jammer: true
+      jammer: false
     },
     bombHolder: {},
     newBombHolder: {},
@@ -270,7 +270,6 @@ class App extends Component {
       received: false,
       given: false
     });
-
   }
 
   roomDataWSHandler(data: {room: string, players: Array<Player>}) {
@@ -514,7 +513,7 @@ class App extends Component {
             <Match
               exactly pattern='/rooms/:id/game'
               render={() => {
-                const {bombHolder, newBombHolder, possibleHolders, received, given, powerups, jammed} = this.state;
+                const {bombHolder, newBombHolder, possibleHolders, received, given, powerups, jammed, dead} = this.state;
                 if (bombHolder.id === this.socket.id) {
                   return (<BombHolder
                     time={time}
@@ -524,6 +523,7 @@ class App extends Component {
                     given={given}
                     newBombHolder={newBombHolder}
                     jammed={jammed}
+                    dead={dead}
                   />);
                 } else {
                   return (<Spectator

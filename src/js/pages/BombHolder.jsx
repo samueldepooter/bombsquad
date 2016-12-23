@@ -29,7 +29,8 @@ type Props = {
   possibleHolders: Array<Player>,
   newBombHolder: Player,
   given: boolean,
-  jammed:boolean
+  jammed:boolean,
+  dead:boolean
 }
 
 class BombHolder extends Component {
@@ -72,6 +73,8 @@ class BombHolder extends Component {
 
     this.deviceOrientation = eventData => {
 
+      const {dead} = this.props;
+
       if (eventData) this.rotationGamma = eventData.gamma;
       this.rotationGamma = Math.round(this.rotationGamma);
       this.divideAngle(this.rotationGamma);
@@ -84,6 +87,13 @@ class BombHolder extends Component {
       this.generatePitch();
       this.generateGain();
       this.playJammer();
+
+      if (dead) {
+        window.removeEventListener(`deviceorientation`, this.deviceOrientation, false);
+        if (jamSource !== undefined) {
+          jamSource.stop();
+        }
+      }
 
     };
 
@@ -197,10 +207,10 @@ class BombHolder extends Component {
     this.statusGreen.style.opacity = ((counter / 100) * 2).toString();
 
     if (counter >= 50) {
+      onOpenVault();
       this.unlock.start();
       window.removeEventListener(`deviceorientation`, this.deviceOrientation, false);
       jamSource.stop();
-      onOpenVault();
     }
   }
 
