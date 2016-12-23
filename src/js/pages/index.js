@@ -5,4 +5,3 @@ export BombHolder from './BombHolder';
 export Spectator from './Spectator';
 export Dead from './Dead';
 export Winner from './Winner';
-export Rotation from './Rotation';

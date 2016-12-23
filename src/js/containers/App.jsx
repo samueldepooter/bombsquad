@@ -4,9 +4,8 @@ import React, {Component} from 'react';
 import {Match, Redirect} from 'react-router';
 import Router from 'react-router/BrowserRouter';
 import IO from 'socket.io-client';
-import Tone from 'tone';
 
-const timerTime = 1000;
+const timerTime = 20;
 const waitTime = 2000;
 
 import {
@@ -16,8 +15,7 @@ import {
   BombHolder,
   Spectator,
   Dead,
-  Winner,
-  Rotation
+  Winner
 } from '../pages/';
 
 let router: Object = {};
@@ -46,10 +44,13 @@ type state = {
   error: string,
   winner: boolean,
   received: boolean,
-  given: boolean
+  given: boolean,
+  jammed: boolean
 }
 
 class App extends Component {
+
+  timer:number
 
   state: state = {
     players: 0,
@@ -59,7 +60,7 @@ class App extends Component {
     picture: ``,
     powerups: {
       shield: false,
-      jammer: false
+      jammer: true
     },
     bombHolder: {},
     newBombHolder: {},
@@ -68,7 +69,8 @@ class App extends Component {
     error: ``,
     winner: false,
     received: false,
-    given: false
+    given: false,
+    jammed: false
   }
 
   socket: Object
@@ -112,14 +114,9 @@ class App extends Component {
   }
 
   jammedWSHandler() {
-    console.log(`You have been jammed!`);
-
-
-
-
-
-
-    //hier fucken met het geluid
+    let {jammed} = this.state;
+    jammed = true;
+    this.setState({jammed});
   }
 
   jammerUsedWSHandler(status: boolean) {
@@ -509,7 +506,7 @@ class App extends Component {
             <Match
               exactly pattern='/rooms/:id/game'
               render={() => {
-                const {bombHolder, newBombHolder, possibleHolders, received, given, powerups} = this.state;
+                const {bombHolder, newBombHolder, possibleHolders, received, given, powerups, jammed} = this.state;
                 if (bombHolder.id === this.socket.id) {
                   return (<BombHolder
                     time={time}
@@ -518,6 +515,7 @@ class App extends Component {
                     possibleHolders={possibleHolders}
                     given={given}
                     newBombHolder={newBombHolder}
+                    jammed={jammed}
                   />);
                 } else {
                   return (<Spectator
@@ -566,12 +564,6 @@ class App extends Component {
                     }} />
                   );
                 }
-              }}
-            />
-            <Match
-              exactly pattern='/rotation'
-              render={() => {
-                return (<Rotation />);
               }}
             />
             <Match exactly pattern='/*' render={() => {

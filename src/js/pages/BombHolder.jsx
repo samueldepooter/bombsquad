@@ -1,24 +1,17 @@
+//@flow
+
 import React, {Component} from 'react';
 import {Given, PassBomb} from '../components';
 import {isEmpty} from 'lodash';
 import double from '../globals/double';
 import Tone from 'tone';
 
-let random;
-let rotationGamma;
 let rotationValue = 0;
 let counter = 0;
 
-let pitch;
-let unlock;
+let jamSource;
+let jammedLocal = false;
 
-let buffer;
-let source;
-
-let buff;
-const pitchCounter = 0;
-
-let wheelFront, wheelShadow, statusGreen;
 
 //dynamische values
 const interval = 10;
@@ -35,7 +28,8 @@ type Props = {
   onPassBomb: () => void,
   possibleHolders: Array<Player>,
   newBombHolder: Player,
-  given: boolean
+  given: boolean,
+  jammed:boolean
 }
 
 class BombHolder extends Component {
@@ -45,88 +39,170 @@ class BombHolder extends Component {
   number: number
   pitch: Object
   props: Props
+  wheelFront: HTMLElement
+  wheelShadow: HTMLElement
+  statusGreen: HTMLElement
+  unlock: Object
+  deviceOrientation: ()=>void
+  gamma: number
+  rotationGamma: number
+  random: number
+  gain: Object
+  clickSound: Object
+  clickSoundBuffer: Object
+  jammerSound: Object
+  jammerSoundBuffer:Object
+  distance:number
+
 
   componentDidMount() {
 
-    wheelFront = document.querySelector(`.wheelFront`);
-    wheelShadow = document.querySelector(`.wheelShadow`);
-    statusGreen = document.querySelector(`.statusGreen`);
+    this.wheelFront = document.querySelector(`.wheelFront`);
+    this.wheelShadow = document.querySelector(`.wheelShadow`);
+    this.statusGreen = document.querySelector(`.statusGreen`);
 
-    this.createPlayer();
-    random = Math.round(((Math.random() * 80) - 80) / 10) * interval;
-    this.handleDeviceRotation();
+    this.unlock = new Tone.Player(`../../assets/sounds/unlock.mp3`).toMaster();
+
+    this.generateRandom();
+    this.createClickSound();
+    this.createJammerSound();
+    this.createPitch();
+    this.createGain();
+    // this.playJammer();
+
+    this.deviceOrientation = eventData => {
+
+      if (eventData) this.rotationGamma = eventData.gamma;
+      this.rotationGamma = Math.round(this.rotationGamma);
+      this.divideAngle(this.rotationGamma);
+
+      this.wheelFront.style.transform = `rotate(${rotationValue.toString()}deg)`;
+      this.wheelShadow.style.transform = `rotate(${rotationValue.toString()}deg)`;
+
+      this.checkRotation();
+      this.calculateDistanceToSound();
+      this.generatePitch();
+      this.generateGain();
+      this.playJammer();
+
+    };
+
+    window.addEventListener(`deviceorientation`, this.deviceOrientation, false);
+
   }
 
-  createAudioSettings() {
-    pitch = new Tone.PitchShift(pitchCounter).toMaster();
+  generateRandom() {
+    do {
+      this.random = Math.round(((Math.random() * 80) - 80) / 10) * interval;
+    } while (Math.abs(this.random) === 0);
+
+    console.log(this.random);
   }
 
-  createPlayer() {
-    unlock = new Tone.Player(`../../assets/sounds/unlock.mp3`).toMaster();
-    buffer = new Tone.Buffer(`../../assets/sounds/click.mp3`, () => {
-      buff = buffer.get();
-      this.createAudioSettings();
+  createPitch() {
+    this.pitch = new Tone.PitchShift(0).toMaster();
+  }
+
+  createGain() {
+    this.gain = new Tone.Gain(1).toMaster();
+  }
+
+  createClickSound() {
+    this.clickSound = new Tone.Buffer(`../../assets/sounds/click.mp3`, () => {
+      this.clickSoundBuffer = this.clickSound.get();
     });
   }
 
-  playSound() {
-    source = Tone.context.createBufferSource();
-    source.buffer = buff;
-    source.connect(pitch);
+  createJammerSound() {
+    this.jammerSound = new Tone.Buffer(`../../assets/sounds/jammer.mp3`, () => {
+      this.jammerSoundBuffer = this.jammerSound.get();
+    });
+  }
+
+  playJammer() {
+
+    const {jammed} = this.props;
+
+    console.log(`jammed:`, jammed, `jammedlocal:`, jammedLocal);
+
+    if (jammed && !jammedLocal) {
+      jamSource = Tone.context.createBufferSource();
+      jamSource.buffer = this.jammerSoundBuffer;
+      jamSource.connect(this.gain);
+      this.gain.connect(Tone.context.destination);
+      jamSource.start();
+      jammedLocal = true;
+    }
+  }
+
+  playSound(buffer: Object) {
+    const source = Tone.context.createBufferSource();
+    source.buffer = buffer;
+    source.connect(this.pitch);
     source.start();
   }
 
-  handleDeviceRotation() {
-
-    window.addEventListener(`deviceorientation`, eventData => {
-
-      rotationGamma = eventData.gamma;
-      rotationGamma = Math.round(rotationGamma);
-      this.divideAngle(rotationGamma);
-
-      wheelFront.style.transform = `rotate(${rotationValue.toString()}deg)`;
-      wheelShadow.style.transform = `rotate(${rotationValue.toString()}deg)`;
-
-      if (rotationGamma < random + (interval / 2) && rotationGamma > random - (interval / 2)) {
-        this.checkLock();
-      } else {
-        statusGreen.style.opacity = `0`;
-        counter = 0;
-      }
-      this.distanceToSound();
-    });
+  checkRotation() {
+    if (this.rotationGamma < this.random + (interval / 2) && this.rotationGamma > this.random - (interval / 2)) {
+      this.checkLock();
+    } else {
+      this.statusGreen.style.opacity = `0`;
+      counter = 0;
+    }
   }
 
-  divideAngle(rotationGamma) {
+  divideAngle(rotationGamma: number) {
+
     if (rotationGamma % interval === 0) {
       if (rotationGamma !== rotationValue) {
-        this.playSound();
+        this.playSound(this.clickSoundBuffer);
       }
       rotationValue = rotationGamma;
     }
   }
 
-  distanceToSound() {
-    if (!pitch) {
+  calculateDistanceToSound() {
+    this.distance = Math.abs((this.random - rotationValue) / interval);
+  }
+
+  generatePitch() {
+    if (!this.pitch) {
       return;
     }
-    const distance = - Math.abs((random - rotationValue) / interval);
-    pitch.pitch = distance * 2;
+    this.pitch.pitch = (- this.distance) * 2;
+    // console.log(this.pitch.pitch);
+  }
+
+  generateGain() {
+    if (!this.gain) {
+      return;
+    }
+    // console.log(this.gain);
+    // this.gain.gain.value = (90 - (this.distance / 2)) / 2;
+    this.gain.gain.value = this.map(this.distance * 10, 0, 160, 3, 0);
+    console.log(`mappinge`, this.map(this.distance * 10, 0, 160, 3, 0));
+    console.log(`distance`, this.distance);
+
+    // console.log(`luidheid:`, (5 + this.distance) / 10);
+  }
+
+  map(value: number, currentMin: number, currentMax: number, futureMin: number, futureMax: number) {
+    return (value - currentMin) / (currentMax - currentMin) * (futureMax - futureMin) + futureMin;
   }
 
   checkLock() {
     const {onOpenVault} = this.props;
 
     counter ++;
-    statusGreen.style.opacity = ((counter / 100) * 2).toString();
+    this.statusGreen.style.opacity = ((counter / 100) * 2).toString();
 
     if (counter === 50) {
-      unlock.start();
+      this.unlock.start();
+      window.removeEventListener(`deviceorientation`, this.deviceOrientation, false);
+      jamSource.stop();
       onOpenVault();
-      //next state
     }
   }
-
 
   renderFutureBombHolders() {
     const {possibleHolders, onPassBomb} = this.props;
