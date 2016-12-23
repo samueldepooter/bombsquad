@@ -16,33 +16,30 @@ class TakePicture extends Component {
   video: HTMLVideoElement
   canvas: HTMLCanvasElement
   ctx: ?CanvasRenderingContext2D
-  onPhone: boolean;
-  picturebutton: HTMLElement;
+  picturebutton: HTMLElement
 
   componentDidMount() {
 
     this.canvas = ((document.querySelector(`.pictureCanvas`): any): HTMLCanvasElement);
     this.ctx = this.canvas.getContext(`2d`);
 
-    if (this.onPhone) {
+    if (this.checkOnPhone()) {
       this.picturebutton.style.display = `none`;
-
     } else {
       this.picturebutton.style.display = `inline-block`;
       this.video = ((document.querySelector(`.video`): any): HTMLVideoElement);
 
+      if (!this.video) return;
       this.videoHandler();
       this.video.addEventListener(`click`, () => this.snapshotHandler());
     }
   }
 
-
-
   videoHandler() {
-    navigator.getUserMedia  = navigator.getUserMedia ||
-                              navigator.webkitGetUserMedia ||
-                              navigator.mozGetUserMedia ||
-                              navigator.msGetUserMedia;
+    navigator.getUserMedia  = navigator.getUserMedia
+                              || navigator.webkitGetUserMedia
+                              || navigator.mozGetUserMedia
+                              || navigator.msGetUserMedia;
 
     if (navigator.mediaDevices) {
       navigator.mediaDevices.getUserMedia({video: true})
@@ -70,19 +67,6 @@ class TakePicture extends Component {
   }
 
   onTakePictureChange(e: Object) {
-
-    /* OUDE CODE: laat ik even staan want dit werkt zeker op alle smartphones maar is niet geoptimised */
-    // const files = e.target.files;
-    // let file;
-    // if (files && files.length > 0) {
-    //   file = files[0];
-    //   const fileReader = new FileReader();
-    //   fileReader.onload = e => {
-    //     const {onTakePicture} = this.props;
-    //     onTakePicture(e.target.result);
-    //   };
-    //   fileReader.readAsDataURL(file);
-    // }
 
     const files = e.target.files;
     let file;
@@ -146,21 +130,8 @@ class TakePicture extends Component {
   }
 
   checkOnPhone() {
-    if (navigator.userAgent.match(/Android/i)
-      || navigator.userAgent.match(/webOS/i)
-      || navigator.userAgent.match(/iPhone/i)
-      || navigator.userAgent.match(/iPad/i)
-        || navigator.userAgent.match(/iPod/i)
-      || navigator.userAgent.match(/BlackBerry/i)
-      || navigator.userAgent.match(/Windows Phone/i)
-    ) {
-      this.onPhone = true;
-    }
-    else {
-      this.onPhone = false;
-    }
-
-    return this.onPhone;
+    try { document.createEvent(`TouchEvent`);return true; }
+    catch (e) { return false; }
   }
 
   imageSourceRender() {
@@ -190,26 +161,18 @@ class TakePicture extends Component {
           <h2>Take a selfie! This will be your avatar.</h2>
           <div className='screw screwright'></div>
         </header>
+
         <div className='camera'>
-        {this.imageSourceRender()}
+          {this.imageSourceRender()}
         </div>
+
         <canvas className='pictureCanvas'></canvas>
+
         <div className='picturebuttonwrapper'>
           <button className='picturebutton' ref={picturebutton => this.picturebutton = picturebutton} onClick={() => this.snapshotHandler()}></button>
         </div>
+
       </section>
-
-
-      // <section>
-      //
-      //   <div className='camera'>
-      //     <img src='' className='myImg' />
-      //     <input type='file' className='takePicture' capture accept='image/*' onChange={e => this.onTakePictureChange(e)} />
-      //     <video className='video' autoPlay>Taking picture is not available!</video>
-      //   </div>
-      //
-      //   <canvas className='pictureCanvas'></canvas>
-      // </section>
     );
   }
 

@@ -120,7 +120,7 @@ class BombHolder extends Component {
     counter ++;
     statusGreen.style.opacity = ((counter / 100) * 2).toString();
 
-    if (counter === 50) {
+    if (counter >= 50) {
       unlock.start();
       onOpenVault();
       //next state
@@ -132,7 +132,7 @@ class BombHolder extends Component {
 
     return possibleHolders.map((player, i) => {
       return (
-        <li className='playerPicture' style={{backgroundImage: `url(${player.picture})`}} key={i} onClick={e => onPassBomb(e, player)}></li>
+        <li className='playerPicture' style={{backgroundImage: `url(${player.picture})`}} key={i} onClick={() => onPassBomb(player)}></li>
       );
     });
   }

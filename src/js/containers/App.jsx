@@ -113,12 +113,6 @@ class App extends Component {
 
   jammedWSHandler() {
     console.log(`You have been jammed!`);
-
-
-
-
-
-
     //hier fucken met het geluid
   }
 
@@ -415,9 +409,7 @@ class App extends Component {
     this.socket.emit(`vaultOpen`);
   }
 
-  passBombHandler(e: Object, player: Player) {
-
-    e.preventDefault();
+  passBombHandler(player: Player) {
 
     const {powerups, time} = this.state;
 
@@ -524,7 +516,7 @@ class App extends Component {
                   return (<BombHolder
                     time={time}
                     onOpenVault={() => this.openVaultHandler()}
-                    onPassBomb={(e, player) => this.passBombHandler(e, player)}
+                    onPassBomb={player => this.passBombHandler(player)}
                     possibleHolders={possibleHolders}
                     given={given}
                     newBombHolder={newBombHolder}
